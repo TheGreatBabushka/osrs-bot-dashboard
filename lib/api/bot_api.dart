@@ -1,22 +1,51 @@
-class Account {
-  String id;
-  String name;
-  String script;
-  bool isRunning;
+import 'dart:convert';
 
-  Account(this.id, this.name, this.script, this.isRunning);
-}
+import 'package:http/http.dart' as http;
 
-class BotRequests {
-  static const String BASE_URL = "http://localhost:8080";
+import 'account.dart';
 
-  static Future<List<Account>> getAccounts() async {
+class BotAPI {
+  static const String BASE_URL = "http://192.168.1.156:8080";
+
+  /*
+   * Returns a list of all currently active accounts (bots currently running)
+   */
+  static Future<List<Account>> getActiveAccounts() async {
     List<Account> accounts = [];
-    accounts.add(Account("1", "KadKudin", "NewbTrainer", true));
-    accounts.add(Account("2", "TheBeazt32", "Fightaholic", false));
-    accounts.add(Account("3", "Skeeter144", "Fightaholic", false));
-    accounts.add(Account("4", "Skeeter144", "Fightaholic", false));
-    accounts.add(Account("5", "Skeeter144", "Fightaholic", false));
-    return Future.delayed(const Duration(seconds: 1), () => accounts);
+
+    var client = http.Client();
+    try {
+      var response = await client.get(Uri.parse("$BASE_URL/bots/inactive"));
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+
+      for (var account in decodedResponse) {
+        accounts.add(Account.fromJson(account));
+      }
+    } finally {
+      client.close();
+    }
+
+    return accounts;
+  }
+
+  /*
+   * Returns a list of all currently inactive accounts (including banned) 
+   */
+  static Future<List<Account>> getInactiveAccounts() async {
+    List<Account> accounts = [];
+
+    var client = http.Client();
+    try {
+      var response = await client.get(Uri.parse("$BASE_URL/bots/inactive"));
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+
+      for (var account in decodedResponse) {
+        accounts.add(Account.fromJson(account));
+      }
+    } finally {
+      client.close();
+    }
+
+    return accounts;
   }
 }

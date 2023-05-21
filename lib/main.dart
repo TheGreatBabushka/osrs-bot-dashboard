@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:osrs_bot_dashboard/dashboard.dart';
+import 'package:provider/provider.dart';
 
 import 'accounts_list_tile.dart';
+import 'api/bot_provider.dart';
 import 'bots_overview_widget.dart';
 
 void main() {
@@ -102,32 +105,14 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Wrap(
-        children: [
-          const BotSummaryCard(),
-          SizedBox(
-            height: 300,
-            width: 300,
-            child: Card(
-              elevation: 10,
-              child: ListView(
-                children: const [
-                  AccountListTile(name: "KadKudin", script: "NewbTrainer"),
-                  AccountListTile(name: "TheBeazt32", script: "Fightaholic"),
-                  AccountListTile(name: "Skeeter144", script: "Fightaholic"),
-                  AccountListTile(name: "Skeeter144", script: "Fightaholic"),
-                  AccountListTile(name: "Skeeter144", script: "Fightaholic"),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+      body: ChangeNotifierProvider(
+          create: (BuildContext context) => BotProvider(),
+          child: const BotDashboard()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
