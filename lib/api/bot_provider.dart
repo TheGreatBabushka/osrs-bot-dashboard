@@ -3,12 +3,17 @@ import 'package:osrs_bot_dashboard/api/bot_api.dart';
 
 import 'account.dart';
 
-class BotProvider extends ChangeNotifier {
+class BotsModel extends ChangeNotifier {
   final List<Account> _activeAccounts = [];
   final List<Account> _inactiveAccounts = [];
 
   List<Account> get activeAccounts => _activeAccounts;
   List<Account> get inactiveAccounts => _inactiveAccounts;
+
+  BotsModel() {
+    fetchActiveAccounts();
+    fetchInactiveAccounts();
+  }
 
   void addActiveAccount(Account account) {
     _activeAccounts.add(account);

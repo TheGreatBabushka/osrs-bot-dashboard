@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/api/bot_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'dashboard_card.dart';
 
@@ -12,28 +13,29 @@ class BotSummaryCard extends StatefulWidget {
 
 class _BotSummaryCardState extends State<BotSummaryCard> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DashboardCard(
-      title: const Text("Summary", textScaleFactor: 2),
-      footer: TextButton(
-        onPressed: () {
-          BotAPI.getActiveAccounts();
-        },
-        child: const Text("Refresh"),
-      ),
-      child: Table(
-        children: const [
-          TableRow(
-            children: [Text("Running:"), Text("3")],
-          ),
-          TableRow(
-            children: [Text("Banned:"), Text("0")],
-          ),
-          TableRow(
-            children: [Text("Available:"), Text("5")],
-          ),
-        ],
-      ),
-    );
+    return Consumer<BotsModel>(builder: (context, botsModel, child) {
+      var running = botsModel.activeAccounts.length;
+      var inactive = botsModel.inactiveAccounts.length;
+      // var available = running - inactive;
+      return DashboardCard(
+        title: const Text("Summary", textScaleFactor: 2),
+        child: Table(
+          children: [
+            TableRow(
+              children: [const Text("Running:"), Text(running.toString())],
+            ),
+            TableRow(
+              children: [const Text("Banned:"), Text(inactive.toString())],
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

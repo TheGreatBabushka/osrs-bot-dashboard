@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
 import 'package:provider/provider.dart';
 
-import 'accounts_list_tile.dart';
+import 'accounts_list_card.dart';
 import 'api/bot_provider.dart';
-import 'bots_overview_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,10 +55,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'OSRS Bot Dashboard',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'OSRS Bot Dashboard'),
     );
   }
 }
@@ -74,44 +76,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final String _selectedPanel = "";
-
-  ExpansionPanel _createPanel(String title, Widget body, Icon icon) {
-    return ExpansionPanel(
-        headerBuilder: (BuildContext context, bool isExpanded) {
-          return ListTile(
-            leading: icon,
-            title: Text(title),
-          );
-        },
-        body: body,
-        isExpanded: _selectedPanel == title);
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // List panels = [
-    //   _createPanel(
-    //       "Bots", const BotsOverviewWidget(), const Icon(Icons.android)),
-    //   _createPanel(
-    //       "Accounts", const Text("Accounts"), const Icon(Icons.account_circle)),
-    //   _createPanel("Scripts", const Text("Scripts"), const Icon(Icons.code)),
-    //   _createPanel(
-    //       "Settings", const Text("Settings"), const Icon(Icons.settings)),
-    // ];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: ChangeNotifierProvider(
-          create: (BuildContext context) => BotProvider(),
-          child: const BotDashboard()),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        create: (context) => BotsModel(),
+        child: const BotDashboard(),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'account.dart';
@@ -15,12 +16,14 @@ class BotAPI {
 
     var client = http.Client();
     try {
-      var response = await client.get(Uri.parse("$BASE_URL/bots/inactive"));
+      var response = await client.get(Uri.parse("$BASE_URL/bots/active"));
       var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List;
 
       for (var account in decodedResponse) {
         accounts.add(Account.fromJson(account));
       }
+    } on Exception catch (e) {
+      debugPrint(e.toString());
     } finally {
       client.close();
     }

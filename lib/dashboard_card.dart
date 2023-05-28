@@ -19,8 +19,6 @@ class DashboardCard extends StatelessWidget {
     return Card(
       elevation: 3,
       child: SizedBox(
-        width: 300,
-        height: 300,
         child: Column(
           children: [
             Row(
