@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:osrs_bot_dashboard/card/bots_activity_view.dart';
+import 'package:osrs_bot_dashboard/card/inactive_bots_view.dart';
 import 'package:osrs_bot_dashboard/dashboard_card.dart';
 
 import 'api/account.dart';
@@ -15,32 +17,27 @@ class BotDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Wrap(
-          children: [
-            const BotSummaryCard(),
-            DashboardCard(
-              title: const Text("Available", textScaleFactor: 2),
-              child: SizedBox(
-                height: 250,
-                child: ListView(
-                  children: const [],
-                ),
-              ),
-            ),
-            DashboardCard(
-              title: const Text("Active", textScaleFactor: 2),
-              child: SizedBox(
-                height: 250,
-                child: ListView(
-                  children: const [],
-                ),
-              ),
-            ),
-          ],
+    return Wrap(
+      children: [
+        const BotSummaryCard(),
+        const DashboardCard(
+          title: Text("Recent Bot Activity", textScaleFactor: 2),
+          child: BotsActivityView(),
         ),
-      ),
+        const DashboardCard(
+          title: Text("Available", textScaleFactor: 2),
+          child: InactiveBotsView(),
+        ),
+        DashboardCard(
+          title: const Text("Active", textScaleFactor: 2),
+          child: SizedBox(
+            height: 250,
+            child: ListView(
+              children: const [],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

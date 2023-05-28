@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
 
@@ -9,6 +11,7 @@ class BotsModel extends ChangeNotifier {
 
   List<Account> get activeAccounts => _activeAccounts;
   List<Account> get inactiveAccounts => _inactiveAccounts;
+  List<Account> get allAccounts => [..._activeAccounts, ..._inactiveAccounts];
 
   BotsModel() {
     fetchActiveAccounts();
@@ -44,11 +47,13 @@ class BotsModel extends ChangeNotifier {
     var accounts = await BotAPI.getActiveAccounts();
     _activeAccounts.clear();
     _activeAccounts.addAll(accounts);
+    notifyListeners();
   }
 
   void fetchInactiveAccounts() async {
     var accounts = await BotAPI.getInactiveAccounts();
     _inactiveAccounts.clear();
     _inactiveAccounts.addAll(accounts);
+    notifyListeners();
   }
 }

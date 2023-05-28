@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
+import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:provider/provider.dart';
 
 import 'accounts_list_card.dart';
@@ -88,8 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: ChangeNotifierProvider(
-        create: (context) => BotsModel(),
+      body: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => BotsModel()),
+          ChangeNotifierProvider(create: (context) => AccountActivityModel()),
+        ],
         child: const BotDashboard(),
       ),
     );
