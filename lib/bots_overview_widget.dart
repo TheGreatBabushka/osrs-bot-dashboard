@@ -31,7 +31,7 @@ class _BotSummaryCardState extends State<BotSummaryCard> {
               children: [const Text("Running:"), Text(running.toString())],
             ),
             TableRow(
-              children: [const Text("Banned:"), Text(inactive.toString())],
+              children: [const Text("Available:"), Text(inactive.toString())],
             ),
           ],
         ),
