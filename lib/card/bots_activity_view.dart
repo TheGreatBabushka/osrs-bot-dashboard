@@ -10,28 +10,30 @@ class BotsActivityView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var activityModel = Provider.of<AccountActivityModel>(context);
-    var accountsModel = Provider.of<BotsModel>(context);
+    var accountsModel = Provider.of<AccountsModel>(context);
 
-    var accounts = accountsModel.allAccounts;
+    var accounts = accountsModel.accounts;
+    if (accounts.isEmpty) {
+      return const Text("No accounts");
+    }
 
-    return Flex(
-      direction: Axis.vertical,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: activityModel.activities.length,
-            itemBuilder: (context, index) {
-              var activity = activityModel.activities[index];
-              var account = accounts
-                  .where((acc) => acc.id == '${activity.accountId}')
-                  .first;
-
-              return AccountActivityItem(
-                account: account,
-                activity: activity,
-              );
-            },
-          ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: activityModel.activities.length,
+          itemBuilder: (context, index) {
+            var activity = activityModel.activities[index];
+            // var account = accounts
+            //     .where((acc) => acc.id == '${activity.accountId}')
+            //     .first;
+            print(activity);
+            return AccountActivityItem(
+              account: accounts.first,
+              activity: activity,
+            );
+          },
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),

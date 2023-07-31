@@ -3,20 +3,20 @@ import 'package:osrs_bot_dashboard/api/bot_provider.dart';
 import 'package:osrs_bot_dashboard/inactive_bot_item.dart';
 import 'package:provider/provider.dart';
 
-class InactiveBotsView extends StatelessWidget {
-  const InactiveBotsView({super.key});
+class AccountsView extends StatelessWidget {
+  const AccountsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BotsModel>(builder: (context, botsModel, child) {
+    return Consumer<AccountsModel>(builder: (context, botsModel, child) {
       return Flex(
         direction: Axis.vertical,
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: botsModel.inactiveAccounts.length,
+              itemCount: 0,
               itemBuilder: (context, index) {
-                var account = botsModel.inactiveAccounts[index];
+                var account = botsModel.accounts[index];
                 return InactiveBotItem(
                   username: account.username,
                   email: account.email,
@@ -32,8 +32,7 @@ class InactiveBotsView extends StatelessWidget {
               children: [
                 ElevatedButton(
                     onPressed: () {
-                      botsModel.fetchInactiveAccounts();
-                      botsModel.fetchActiveAccounts();
+                      botsModel.fetchAccounts();
                     },
                     child: const Text("Refresh")),
               ],

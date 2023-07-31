@@ -5,26 +5,19 @@ import 'package:osrs_bot_dashboard/api/bot_api.dart';
 
 import 'account.dart';
 
-class BotsModel extends ChangeNotifier {
+class AccountsModel extends ChangeNotifier {
   final List<Account> _activeAccounts = [];
-  final List<Account> _inactiveAccounts = [];
+  final List<Account> _accounts = [];
 
   List<Account> get activeAccounts => _activeAccounts;
-  List<Account> get inactiveAccounts => _inactiveAccounts;
-  List<Account> get allAccounts => [..._activeAccounts, ..._inactiveAccounts];
+  List<Account> get accounts => _accounts;
 
-  BotsModel() {
-    fetchActiveAccounts();
-    fetchInactiveAccounts();
+  AccountsModel() {
+    fetchAccounts();
   }
 
   void addActiveAccount(Account account) {
     _activeAccounts.add(account);
-    notifyListeners();
-  }
-
-  void addInactiveAccount(Account account) {
-    _inactiveAccounts.add(account);
     notifyListeners();
   }
 
@@ -33,27 +26,30 @@ class BotsModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removeInactiveAccount(Account account) {
-    _inactiveAccounts.remove(account);
-    notifyListeners();
-  }
-
   void clearActiveAccounts() {
     _activeAccounts.clear();
     notifyListeners();
   }
 
-  void fetchActiveAccounts() async {
+  void fetchAccounts() async {
     var accounts = await BotAPI.getActiveAccounts();
+    if (accounts == null) {
+      log("Failed to fetch active accounts");
+      return;
+    }
+
     _activeAccounts.clear();
     _activeAccounts.addAll(accounts);
-    notifyListeners();
-  }
 
-  void fetchInactiveAccounts() async {
-    var accounts = await BotAPI.getInactiveAccounts();
-    _inactiveAccounts.clear();
-    _inactiveAccounts.addAll(accounts);
+    accounts = await BotAPI.getAccounts();
+    if (accounts == null) {
+      log("Failed to fetch accounts");
+      return;
+    }
+
+    _accounts.clear();
+    _accounts.addAll(accounts);
+
     notifyListeners();
   }
 }

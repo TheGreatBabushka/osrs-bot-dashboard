@@ -1,82 +1,78 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
 
 import 'account.dart';
 
 class BotAPI {
-  static const String BASE_URL = "http://192.168.1.156:8080";
+  static const String BASE_URL = "http://localhost:8080";
 
   /*
    * Returns a list of all currently active accounts (bots currently running)
    */
-  static Future<List<Account>> getActiveAccounts() async {
-    log('fetching active accounts');
-    List<Account> accounts = [];
-
-    var client = http.Client();
+  static Future<List<Account>?> getActiveAccounts() async {
     try {
-      var response = await client.get(Uri.parse("$BASE_URL/bots/active"));
+      var response = await http.get(Uri.parse("$BASE_URL/bots/active"));
       var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List;
 
+      var accounts = <Account>[];
       for (var account in decodedResponse) {
         accounts.add(Account.fromJson(account));
       }
-    } on Exception catch (e) {
+
+      return accounts;
+    } on SocketException catch (e) {
       debugPrint(e.toString());
-    } finally {
-      client.close();
     }
 
-    return accounts;
+    return null;
   }
 
   /*
-   * Returns a list of all currently inactive accounts (including banned) 
-   */
-  static Future<List<Account>> getInactiveAccounts() async {
-    log('fetching inactive accounts');
-    List<Account> accounts = [];
-
-    var client = http.Client();
+  * Returns a list of all accounts
+  */
+  static Future<List<Account>?> getAccounts() async {
     try {
-      var response = await client.get(Uri.parse("$BASE_URL/bots/inactive"));
+      var response = await http.get(Uri.parse("$BASE_URL/accounts"));
       var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List;
 
+      var accounts = <Account>[];
       for (var account in decodedResponse) {
         accounts.add(Account.fromJson(account));
       }
-    } finally {
-      client.close();
+
+      return accounts;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
     }
 
-    return accounts;
+    return null;
   }
 
-  /*
-  * Returns a list of all account activity
-  */
-  static Future<List<AccountActivity>> getAccountActivity() async {
-    log('fetching all account activity');
-
-    List<AccountActivity> activities = [];
-
-    var client = http.Client();
+  static Future<List<AccountActivity>?> fetchAccountActivity() async {
     try {
-      var response = await client.get(Uri.parse("$BASE_URL/bots/activity"));
-      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+      var response = await http.get(Uri.parse("$BASE_URL/bots/activity"));
+      if (response.statusCode != 200) {
+        throw Exception("Failed to fetch account activity");
+      }
 
-      for (var account in decodedResponse) {
+      var data = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+
+      var activities = <AccountActivity>[];
+      for (var account in data) {
         activities.add(AccountActivity.fromJson(account));
       }
-    } finally {
-      client.close();
+      return activities;
+    } on SocketException catch (_) {
+      log('failed to connect to host');
     }
 
-    return activities;
+    return null;
   }
 
   /*
@@ -93,9 +89,15 @@ class BotAPI {
     }
   }
 
-  static Future<List<Account>> getAccounts() {
-    // this could be optimized to only make one request, but meh
-    return Future.wait([getActiveAccounts(), getInactiveAccounts()])
-        .then((value) => value[0] + value[1]);
+  // Returns a future response from a GET request made to the given url string
+  static Future<Response> _get(String url) async {
+    try {
+      return await http.get(Uri.parse(url)).then((response) {
+        return response;
+      });
+    } on SocketException catch (_) {
+      log('failed to connect to host');
+      return Future.error("Failed to connect to host");
+    }
   }
 }

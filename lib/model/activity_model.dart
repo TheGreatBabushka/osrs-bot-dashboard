@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
@@ -33,7 +35,12 @@ class AccountActivityModel extends ChangeNotifier {
   }
 
   void fetchActivities() async {
-    var activities = await BotAPI.getAccountActivity();
+    var activities = await BotAPI.fetchAccountActivity();
+    if (activities == null) {
+      log("Failed to fetch activities");
+      return;
+    }
+
     _activities.clear();
     _activities.addAll(activities);
     notifyListeners();

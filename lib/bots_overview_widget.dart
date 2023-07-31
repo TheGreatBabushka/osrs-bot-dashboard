@@ -19,9 +19,9 @@ class _BotSummaryCardState extends State<BotSummaryCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BotsModel>(builder: (context, botsModel, child) {
+    return Consumer<AccountsModel>(builder: (context, botsModel, child) {
       var running = botsModel.activeAccounts.length;
-      var inactive = botsModel.inactiveAccounts.length;
+      // var inactive = botsModel.inactiveAccounts.length;
       // var available = running - inactive;
       return DashboardCard(
         title: const Text("Summary", textScaleFactor: 2),
@@ -30,9 +30,9 @@ class _BotSummaryCardState extends State<BotSummaryCard> {
             TableRow(
               children: [const Text("Running:"), Text(running.toString())],
             ),
-            TableRow(
-              children: [const Text("Available:"), Text(inactive.toString())],
-            ),
+            // TableRow(
+            //   children: [const Text("Available:"), Text(inactive.toString())],
+            // ),
           ],
         ),
       );

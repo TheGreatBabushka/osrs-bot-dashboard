@@ -16,29 +16,23 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 400, maxHeight: 400),
-      child: Card(
-        elevation: 3,
-        child: Center(
-          child: Flex(
-            direction: Axis.vertical,
+    return Card(
+      elevation: 3,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _title,
-                ],
-              ),
-              const Divider(height: 5),
-              Expanded(child: _child),
-              if (_footer != null) const Divider(height: 5),
-              if (_footer != null) _footer!,
+              _title,
             ],
           ),
-        ),
+          const Divider(height: 5),
+          _child,
+          if (_footer != null) const Divider(height: 5),
+          if (_footer != null) _footer!,
+        ],
       ),
     );
   }

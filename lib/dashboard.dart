@@ -13,26 +13,27 @@ class BotDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(
+      direction: Axis.horizontal,
       children: [
-        const BotSummaryCard(),
-        const DashboardCard(
+        BotSummaryCard(),
+        BotsActivityView(),
+        DashboardCard(
           title: Text("Recent Bot Activity", textScaleFactor: 2),
           child: BotsActivityView(),
         ),
-        const DashboardCard(
-          title: Text("Available", textScaleFactor: 2),
-          child: InactiveBotsView(),
-        ),
         DashboardCard(
-          title: const Text("Active", textScaleFactor: 2),
-          child: SizedBox(
-            height: 250,
-            child: ListView(
-              children: const [],
-            ),
-          ),
+          title: Text("Inactive", textScaleFactor: 2),
+          child: _accountsView(),
         ),
+        // DashboardCard(
+        //   title: Text("Available", textScaleFactor: 2),
+        //   child: InactiveBotsView(),
+        // ),
       ],
     );
+  }
+
+  Widget _accountsView() {
+    return Placeholder();
   }
 }

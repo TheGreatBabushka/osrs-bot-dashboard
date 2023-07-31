@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:osrs_bot_dashboard/accounts_view.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:provider/provider.dart';
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
       title: 'OSRS Bot Dashboard',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+          seedColor: Colors.green.shade500,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
@@ -91,10 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => BotsModel()),
+          ChangeNotifierProvider(create: (context) => AccountsModel()),
           ChangeNotifierProvider(create: (context) => AccountActivityModel()),
         ],
-        child: const BotDashboard(),
+        child: const AccountsView(),
       ),
     );
   }
