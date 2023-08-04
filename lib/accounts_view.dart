@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:osrs_bot_dashboard/dialog/start_bot_dialog.dart';
 import 'package:provider/provider.dart';
 
+import 'api/account.dart';
 import 'api/bot_provider.dart';
 
 class AccountsView extends StatelessWidget {
@@ -19,7 +21,7 @@ class AccountsView extends StatelessWidget {
         return ListTile(
           leading: IconButton(
             icon: const Icon(Icons.play_circle),
-            onPressed: () {},
+            onPressed: () => _showStartBotDialog(context, account),
           ),
           trailing: IconButton(
             icon: const Icon(Icons.edit),
@@ -28,6 +30,15 @@ class AccountsView extends StatelessWidget {
           title: Text(account.username),
           subtitle: Text(account.id),
         );
+      },
+    );
+  }
+
+  void _showStartBotDialog(BuildContext context, Account account) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StartBotDialog(account: account);
       },
     );
   }
