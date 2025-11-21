@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/accounts_view.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
+import 'package:osrs_bot_dashboard/dialog/add_account_dialog.dart';
 import 'package:osrs_bot_dashboard/dialog/settings_dialog.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
@@ -121,6 +122,24 @@ class _MyHomePageState extends State<MyHomePage> {
               ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
             ],
             child: const AccountsView(),
+          );
+        },
+      ),
+      floatingActionButton: Consumer<SettingsModel>(
+        builder: (context, settingsModel, child) {
+          if (settingsModel.isLoading) {
+            return const SizedBox.shrink();
+          }
+          
+          return FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const AddAccountDialog(),
+              );
+            },
+            tooltip: 'Add Account',
+            child: const Icon(Icons.add),
           );
         },
       ),
