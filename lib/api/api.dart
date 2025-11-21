@@ -109,7 +109,7 @@ class BotAPI {
         }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.created;
     } on SocketException catch (e) {
       debugPrint(e.toString());
       return false;
@@ -137,7 +137,7 @@ class BotAPI {
         }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 204;
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.noContent;
     } on SocketException catch (e) {
       debugPrint(e.toString());
       return false;
@@ -157,7 +157,7 @@ class BotAPI {
         headers: {"Content-Type": "application/json"},
       );
 
-      return response.statusCode == 200 || response.statusCode == 204;
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.noContent;
     } on SocketException catch (e) {
       debugPrint(e.toString());
       return false;
