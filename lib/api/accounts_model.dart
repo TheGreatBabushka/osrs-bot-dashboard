@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/api/api.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
 
 import 'account.dart';
@@ -44,7 +44,7 @@ class AccountsModel extends ChangeNotifier {
 
     try {
       final api = BotAPI(settingsModel.apiIp);
-      
+
       var accounts = await api.getActiveAccounts();
       if (accounts == null) {
         log("Failed to fetch active accounts");

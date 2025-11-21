@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/account_activity_item.dart';
-import 'package:osrs_bot_dashboard/api/bot_provider.dart';
+import 'package:osrs_bot_dashboard/api/accounts_model.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:provider/provider.dart';
 

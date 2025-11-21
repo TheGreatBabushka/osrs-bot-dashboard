@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/api/api.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
 import 'package:provider/provider.dart';
@@ -52,9 +52,8 @@ class _InactiveBotItemState extends State<InactiveBotItem> {
     var activities = context.read<AccountActivityModel>();
     var settingsModel = context.read<SettingsModel>();
 
-    var lastActivity = activities.activities
-        .where((activity) => '${activity.accountId}' == widget.id)
-        .first;
+    var lastActivity =
+        activities.activities.where((activity) => '${activity.accountId}' == widget.id).first;
 
     var args = lastActivity.command.split(' ');
     var script = args.first;

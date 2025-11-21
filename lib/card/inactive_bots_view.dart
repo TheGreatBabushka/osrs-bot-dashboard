@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:osrs_bot_dashboard/api/bot_provider.dart';
+import 'package:osrs_bot_dashboard/api/accounts_model.dart';
 import 'package:osrs_bot_dashboard/inactive_bot_item.dart';
 import 'package:provider/provider.dart';
 

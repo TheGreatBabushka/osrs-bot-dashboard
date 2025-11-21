@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
-import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/api/api.dart';
 
 class AddAccountDialog extends StatefulWidget {
   final String apiIp;
@@ -153,7 +153,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     if (success) {
       // Notify parent to refresh the accounts list
       widget.onAccountAdded();
-      
+
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -166,7 +166,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       setState(() {
         _isSubmitting = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to add account. Please try again.'),

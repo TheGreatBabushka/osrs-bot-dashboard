@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
-import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/api/api.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
 
 /// Model class for the most recent activity a bot has performed

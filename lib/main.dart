@@ -8,7 +8,7 @@ import 'package:osrs_bot_dashboard/state/settings_model.dart';
 import 'package:provider/provider.dart';
 
 import 'accounts_list_card.dart';
-import 'api/bot_provider.dart';
+import 'api/accounts_model.dart';
 
 void main() {
   runApp(const MyApp());
@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         }
-        
+
         return MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
@@ -132,7 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (BuildContext scaffoldContext) {
                 return FloatingActionButton(
                   onPressed: () {
-                    final accountsModel = Provider.of<AccountsModel>(scaffoldContext, listen: false);
+                    final accountsModel =
+                        Provider.of<AccountsModel>(scaffoldContext, listen: false);
                     showDialog(
                       context: scaffoldContext,
                       builder: (_) => AddAccountDialog(

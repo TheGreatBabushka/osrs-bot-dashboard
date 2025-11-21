@@ -4,7 +4,7 @@ import 'package:osrs_bot_dashboard/dialog/start_bot_dialog.dart';
 import 'package:provider/provider.dart';
 
 import 'api/account.dart';
-import 'api/bot_provider.dart';
+import 'api/accounts_model.dart';
 
 class AccountsView extends StatelessWidget {
   const AccountsView({super.key});

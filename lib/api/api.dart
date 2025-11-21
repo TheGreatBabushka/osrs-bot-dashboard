@@ -98,7 +98,7 @@ class BotAPI {
     try {
       // Convert status enum to string format expected by backend
       String statusString = status.name.toLowerCase();
-      
+
       var response = await http.post(
         Uri.parse("$baseUrl/accounts"),
         headers: {"Content-Type": "application/json"},
@@ -108,7 +108,7 @@ class BotAPI {
           "status": statusString,
         }),
       );
-      
+
       return response.statusCode == 200 || response.statusCode == 201;
     } on SocketException catch (e) {
       debugPrint(e.toString());
