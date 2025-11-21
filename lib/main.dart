@@ -91,58 +91,56 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Settings',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const SettingsDialog(),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Consumer<SettingsModel>(
-        builder: (context, settingsModel, child) {
-          if (settingsModel.isLoading) {
-            return const Center(
+    return Consumer<SettingsModel>(
+      builder: (context, settingsModel, child) {
+        if (settingsModel.isLoading) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: Text(widget.title),
+            ),
+            body: const Center(
               child: CircularProgressIndicator(),
-            );
-          }
-          
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
-              ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
-            ],
-            child: const AccountsView(),
+            ),
           );
-        },
-      ),
-      floatingActionButton: Consumer<SettingsModel>(
-        builder: (context, settingsModel, child) {
-          if (settingsModel.isLoading) {
-            return const SizedBox.shrink();
-          }
-          
-          return FloatingActionButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const AddAccountDialog(),
-              );
-            },
-            tooltip: 'Add Account',
-            child: const Icon(Icons.add),
-          );
-        },
-      ),
+        }
+        
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
+            ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
+          ],
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: Text(widget.title),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  tooltip: 'Settings',
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const SettingsDialog(),
+                    );
+                  },
+                ),
+              ],
+            ),
+            body: const AccountsView(),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AddAccountDialog(),
+                );
+              },
+              tooltip: 'Add Account',
+              child: const Icon(Icons.add),
+            ),
+          ),
+        );
+      },
     );
   }
 }
