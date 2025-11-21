@@ -114,14 +114,16 @@ class AccountsView extends StatelessWidget {
               var isRunning = _isAccountRunning(activity);
               
               return ListTile(
-                leading: IconButton(
-                  icon: Icon(
-                    isRunning ? Icons.stop_circle : Icons.play_circle,
-                    color: isRunning ? Colors.red : Colors.green,
-                  ),
-                  onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
-                  tooltip: isRunning ? 'Bot Running' : 'Start Bot',
-                ),
+                leading: account.status == AccountStatus.BANNED
+                    ? null
+                    : IconButton(
+                        icon: Icon(
+                          isRunning ? Icons.stop_circle : Icons.play_circle,
+                          color: isRunning ? Colors.red : Colors.green,
+                        ),
+                        onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
+                        tooltip: isRunning ? 'Bot Running' : 'Start Bot',
+                      ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
