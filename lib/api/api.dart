@@ -146,4 +146,24 @@ class BotAPI {
       return false;
     }
   }
+
+  /*
+   * Deletes an account
+   */
+  Future<bool> deleteAccount(String id) async {
+    try {
+      var response = await http.delete(
+        Uri.parse("$baseUrl/accounts/$id"),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      return response.statusCode == 200 || response.statusCode == 204;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+      return false;
+    } catch (e) {
+      debugPrint('Error deleting account: $e');
+      return false;
+    }
+  }
 }

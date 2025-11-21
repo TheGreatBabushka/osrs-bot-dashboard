@@ -17,8 +17,10 @@ class AccountActivityModel extends ChangeNotifier {
 
   List<AccountActivity> get activities => _activities;
 
-  AccountActivityModel(this.settingsModel) {
-    fetchActivities();
+  AccountActivityModel(this.settingsModel, {bool autoFetch = true}) {
+    if (autoFetch) {
+      fetchActivities();
+    }
   }
 
   void addActivity(AccountActivity activity) {
