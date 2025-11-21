@@ -11,20 +11,31 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:osrs_bot_dashboard/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Settings button exists in app bar', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
+    
+    // Wait for the app to load
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the settings button exists
+    expect(find.byIcon(Icons.settings), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Settings dialog can be opened', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
+    
+    // Wait for the app to load
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Tap the settings icon
+    await tester.tap(find.byIcon(Icons.settings));
+    await tester.pumpAndSettle();
+
+    // Verify that the settings dialog is shown
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('API Server Configuration'), findsOneWidget);
+    expect(find.text('API IP Address'), findsOneWidget);
   });
 }
