@@ -10,25 +10,122 @@ class AccountsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // list view of accounts
-    var accounts = Provider.of<AccountsModel>(context).accounts;
-    print(accounts.length);
+    return Consumer<AccountsModel>(
+      builder: (context, accountsModel, child) {
+        // Show loading indicator when fetching data
+        if (accountsModel.isLoading) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Loading accounts...'),
+              ],
+            ),
+          );
+        }
 
-    return ListView.builder(
-      itemCount: accounts.length,
-      itemBuilder: (context, index) {
-        var account = accounts[index];
-        return ListTile(
-          leading: IconButton(
-            icon: const Icon(Icons.play_circle),
-            onPressed: () => _showStartBotDialog(context, account),
+        // Show error state with retry option
+        if (accountsModel.errorMessage != null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error Loading Accounts',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    accountsModel.errorMessage!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () => accountsModel.fetchAccounts(),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Show empty state when no accounts are available
+        if (accountsModel.accounts.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.inbox_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Accounts Available',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'There are no accounts configured yet.\nAdd accounts to get started.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () => accountsModel.fetchAccounts(),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Refresh'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Show list of accounts with pull-to-refresh
+        return RefreshIndicator(
+          onRefresh: () async {
+            accountsModel.fetchAccounts();
+            // Wait a bit to ensure the UI updates
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          child: ListView.builder(
+            itemCount: accountsModel.accounts.length,
+            itemBuilder: (context, index) {
+              var account = accountsModel.accounts[index];
+              return ListTile(
+                leading: IconButton(
+                  icon: const Icon(Icons.play_circle),
+                  onPressed: () => _showStartBotDialog(context, account),
+                  tooltip: 'Start Bot',
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    // TODO: Implement edit functionality
+                  },
+                  tooltip: 'Edit Account',
+                ),
+                title: Text(account.username),
+                subtitle: Text(account.id),
+              );
+            },
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {},
-          ),
-          title: Text(account.username),
-          subtitle: Text(account.id),
         );
       },
     );
