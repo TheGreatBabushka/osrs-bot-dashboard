@@ -4,15 +4,17 @@ import 'package:osrs_bot_dashboard/dialog/start_bot_dialog.dart';
 import 'package:provider/provider.dart';
 
 import 'api/account.dart';
+import 'api/account_activity.dart';
 import 'api/accounts_model.dart';
+import 'model/activity_model.dart';
 
 class AccountsView extends StatelessWidget {
   const AccountsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AccountsModel>(
-      builder: (context, accountsModel, child) {
+    return Consumer2<AccountsModel, AccountActivityModel>(
+      builder: (context, accountsModel, activityModel, child) {
         // Show loading indicator when fetching data
         if (accountsModel.isLoading) {
           return const Center(
@@ -100,16 +102,25 @@ class AccountsView extends StatelessWidget {
 
         // Show list of accounts with pull-to-refresh
         return RefreshIndicator(
-          onRefresh: () => accountsModel.fetchAccounts(),
+          onRefresh: () async {
+            await accountsModel.fetchAccounts();
+            activityModel.fetchActivities();
+          },
           child: ListView.builder(
             itemCount: accountsModel.accounts.length,
             itemBuilder: (context, index) {
               var account = accountsModel.accounts[index];
+              var activity = _getActivityForAccount(activityModel, account);
+              var isRunning = _isAccountRunning(activity);
+              
               return ListTile(
                 leading: IconButton(
-                  icon: const Icon(Icons.play_circle),
-                  onPressed: () => _showStartBotDialog(context, account),
-                  tooltip: 'Start Bot',
+                  icon: Icon(
+                    isRunning ? Icons.stop_circle : Icons.play_circle,
+                    color: isRunning ? Colors.red : Colors.green,
+                  ),
+                  onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
+                  tooltip: isRunning ? 'Bot Running' : 'Start Bot',
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),
@@ -119,7 +130,7 @@ class AccountsView extends StatelessWidget {
                   tooltip: 'Edit Account',
                 ),
                 title: Text(account.username),
-                subtitle: Text('${account.id} • ${_getStatusLabel(account.status)}'),
+                subtitle: _buildAccountSubtitle(account, activity),
                 onTap: () => _navigateToAccountInfo(context, account),
               );
             },
@@ -139,6 +150,108 @@ class AccountsView extends StatelessWidget {
         return 'Banned';
       default:
         return 'Unknown';
+    }
+  }
+
+  AccountActivity? _getActivityForAccount(AccountActivityModel activityModel, Account account) {
+    try {
+      return activityModel.activities.firstWhere(
+        (activity) => activity.accountId.toString() == account.id,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  bool _isAccountRunning(AccountActivity? activity) {
+    if (activity == null) return false;
+    
+    var startedTime = DateTime.tryParse(activity.startedAt);
+    var endedTime = DateTime.tryParse(activity.stoppedAt);
+    
+    if (startedTime == null) return false;
+    
+    // If stopped time is null or before/same as started time, it's running
+    if (endedTime == null || 
+        endedTime.isBefore(startedTime) || 
+        endedTime.isAtSameMomentAs(startedTime)) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  Widget _buildAccountSubtitle(Account account, AccountActivity? activity) {
+    var statusText = '${account.id} • ${_getStatusLabel(account.status)}';
+    
+    if (activity != null && _isAccountRunning(activity)) {
+      var command = activity.command;
+      var commandParts = command.split(' ');
+      var scriptName = commandParts.isNotEmpty ? commandParts.first : 'Unknown';
+      
+      var startedTime = DateTime.tryParse(activity.startedAt);
+      var runtimeText = '';
+      if (startedTime != null) {
+        var runtime = DateTime.now().difference(startedTime);
+        runtimeText = _formatRuntime(runtime);
+      }
+      
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(statusText),
+          Text(
+            '🟢 Running: $scriptName${runtimeText.isNotEmpty ? ' • $runtimeText' : ''}',
+            style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w500),
+          ),
+        ],
+      );
+    } else if (activity != null) {
+      var command = activity.command;
+      var commandParts = command.split(' ');
+      var scriptName = commandParts.isNotEmpty ? commandParts.first : 'Unknown';
+      
+      var endedTime = DateTime.tryParse(activity.stoppedAt);
+      var stoppedText = '';
+      if (endedTime != null) {
+        var timeSince = DateTime.now().difference(endedTime);
+        stoppedText = _formatTimeSince(timeSince);
+      }
+      
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(statusText),
+          Text(
+            '⚫ Last ran: $scriptName${stoppedText.isNotEmpty ? ' • $stoppedText' : ''}',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
+      );
+    }
+    
+    return Text(statusText);
+  }
+
+  String _formatRuntime(Duration duration) {
+    if (duration.inHours > 0) {
+      return '${duration.inHours}h ${duration.inMinutes % 60}m';
+    } else if (duration.inMinutes > 0) {
+      return '${duration.inMinutes}m';
+    } else {
+      return '${duration.inSeconds}s';
+    }
+  }
+
+  String _formatTimeSince(Duration duration) {
+    if (duration.inDays > 0) {
+      return '${duration.inDays}d ago';
+    } else if (duration.inHours > 0) {
+      return '${duration.inHours}h ago';
+    } else if (duration.inMinutes > 0) {
+      return '${duration.inMinutes}m ago';
+    } else {
+      return 'just now';
     }
   }
 
