@@ -2,10 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
 
 import 'account.dart';
 
 class AccountsModel extends ChangeNotifier {
+  final SettingsModel settingsModel;
   final List<Account> _activeAccounts = [];
   final List<Account> _accounts = [];
   bool _isLoading = false;
@@ -16,7 +18,7 @@ class AccountsModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  AccountsModel() {
+  AccountsModel(this.settingsModel) {
     fetchAccounts();
   }
 
@@ -41,7 +43,9 @@ class AccountsModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      var accounts = await BotAPI.getActiveAccounts();
+      final api = BotAPI(settingsModel.apiIp);
+      
+      var accounts = await api.getActiveAccounts();
       if (accounts == null) {
         log("Failed to fetch active accounts");
         _errorMessage = "Failed to load accounts. Please try again.";
@@ -53,7 +57,7 @@ class AccountsModel extends ChangeNotifier {
       _activeAccounts.clear();
       _activeAccounts.addAll(accounts);
 
-      accounts = await BotAPI.getAccounts();
+      accounts = await api.getAccounts();
       if (accounts == null) {
         log("Failed to fetch accounts");
         _errorMessage = "Failed to load accounts. Please try again.";

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/accounts_view.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
+import 'package:osrs_bot_dashboard/dialog/settings_dialog.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
 import 'package:provider/provider.dart';
 
 import 'accounts_list_card.dart';
@@ -54,16 +56,19 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'OSRS Bot Dashboard',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green.shade500,
-          brightness: Brightness.dark,
+    return ChangeNotifierProvider(
+      create: (context) => SettingsModel(),
+      child: MaterialApp(
+        title: 'OSRS Bot Dashboard',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.green.shade500,
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
         ),
-        useMaterial3: true,
+        home: const MyHomePage(title: 'OSRS Bot Dashboard'),
       ),
-      home: const MyHomePage(title: 'OSRS Bot Dashboard'),
     );
   }
 }
@@ -89,13 +94,35 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-      ),
-      body: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => AccountsModel()),
-          ChangeNotifierProvider(create: (context) => AccountActivityModel()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const SettingsDialog(),
+              );
+            },
+          ),
         ],
-        child: const AccountsView(),
+      ),
+      body: Consumer<SettingsModel>(
+        builder: (context, settingsModel, child) {
+          if (settingsModel.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
+              ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
+            ],
+            child: const AccountsView(),
+          );
+        },
       ),
     );
   }
