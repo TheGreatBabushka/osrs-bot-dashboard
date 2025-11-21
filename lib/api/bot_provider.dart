@@ -44,7 +44,7 @@ class AccountsModel extends ChangeNotifier {
       var accounts = await BotAPI.getActiveAccounts();
       if (accounts == null) {
         log("Failed to fetch active accounts");
-        _errorMessage = "Failed to fetch active accounts. Please check your connection.";
+        _errorMessage = "Failed to load accounts. Please try again.";
         _isLoading = false;
         notifyListeners();
         return;
@@ -56,7 +56,7 @@ class AccountsModel extends ChangeNotifier {
       accounts = await BotAPI.getAccounts();
       if (accounts == null) {
         log("Failed to fetch accounts");
-        _errorMessage = "Failed to fetch accounts. Please check your connection.";
+        _errorMessage = "Failed to load accounts. Please try again.";
         _isLoading = false;
         notifyListeners();
         return;
@@ -64,7 +64,6 @@ class AccountsModel extends ChangeNotifier {
 
       _accounts.clear();
       _accounts.addAll(accounts);
-      _errorMessage = null;
     } catch (e) {
       log("Error fetching accounts: $e");
       _errorMessage = "An unexpected error occurred. Please try again later.";
