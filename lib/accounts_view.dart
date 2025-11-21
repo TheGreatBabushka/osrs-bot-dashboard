@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:osrs_bot_dashboard/account_info_page.dart';
 import 'package:osrs_bot_dashboard/dialog/start_bot_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -119,6 +120,7 @@ class AccountsView extends StatelessWidget {
                 ),
                 title: Text(account.username),
                 subtitle: Text(account.id),
+                onTap: () => _navigateToAccountInfo(context, account),
               );
             },
           ),
@@ -133,6 +135,14 @@ class AccountsView extends StatelessWidget {
       builder: (context) {
         return StartBotDialog(account: account);
       },
+    );
+  }
+
+  void _navigateToAccountInfo(BuildContext context, Account account) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AccountInfoPage(account: account),
+      ),
     );
   }
 }
