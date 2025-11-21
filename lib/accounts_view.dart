@@ -119,7 +119,7 @@ class AccountsView extends StatelessWidget {
                     isRunning ? Icons.stop_circle : Icons.play_circle,
                     color: isRunning ? Colors.red : Colors.green,
                   ),
-                  onPressed: () => isRunning ? null : _showStartBotDialog(context, account),
+                  onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
                   tooltip: isRunning ? 'Bot Running' : 'Start Bot',
                 ),
                 trailing: IconButton(
