@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
 import 'package:provider/provider.dart';
 
 class InactiveBotItem extends StatefulWidget {
@@ -49,6 +50,7 @@ class _InactiveBotItemState extends State<InactiveBotItem> {
 
   void _startBot() {
     var activities = context.read<AccountActivityModel>();
+    var settingsModel = context.read<SettingsModel>();
 
     var lastActivity = activities.activities
         .where((activity) => '${activity.accountId}' == widget.id)
@@ -61,6 +63,7 @@ class _InactiveBotItemState extends State<InactiveBotItem> {
       params.first = params.first.substring(1);
     }
 
-    BotAPI.startBot('${lastActivity.accountId}', script, params);
+    final api = BotAPI(settingsModel.apiIp);
+    api.startBot('${lastActivity.accountId}', script, params);
   }
 }

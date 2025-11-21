@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
 
 /// Model class for the most recent activity a bot has performed
 ///
@@ -11,11 +12,12 @@ import 'package:osrs_bot_dashboard/api/bot_api.dart';
 /// it was started, and the time it was stopped, as well as the process id of
 /// the bot's current client
 class AccountActivityModel extends ChangeNotifier {
+  final SettingsModel settingsModel;
   final List<AccountActivity> _activities = [];
 
   List<AccountActivity> get activities => _activities;
 
-  AccountActivityModel() {
+  AccountActivityModel(this.settingsModel) {
     fetchActivities();
   }
 
@@ -35,7 +37,8 @@ class AccountActivityModel extends ChangeNotifier {
   }
 
   void fetchActivities() async {
-    var activities = await BotAPI.fetchAccountActivity();
+    final api = BotAPI(settingsModel.apiIp);
+    var activities = await api.fetchAccountActivity();
     if (activities == null) {
       log("Failed to fetch activities");
       return;

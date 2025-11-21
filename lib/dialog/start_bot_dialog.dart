@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
+import 'package:provider/provider.dart';
 
 import '../api/account.dart';
 
@@ -76,7 +78,10 @@ class _StartBotDialogState extends State<StartBotDialog> {
     // This function will be called when the "Start/Run" button is pressed.
     // For this example, it's left empty as you requested.
 
-    BotAPI.startBot(
+    final settingsModel = Provider.of<SettingsModel>(context, listen: false);
+    final api = BotAPI(settingsModel.apiIp);
+    
+    api.startBot(
       widget.account.id,
       selectedScript,
       parametersController.text.split(' '),
