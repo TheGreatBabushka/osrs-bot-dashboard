@@ -27,8 +27,8 @@ class AccountActivity {
     return {
       'account_id': accountId,
       'command': command,
-      'startedAt': startedAt,
-      'stoppedAt': stoppedAt,
+      'started_at': startedAt,
+      'stopped_at': stoppedAt,
       'pid': processId,
     };
   }
