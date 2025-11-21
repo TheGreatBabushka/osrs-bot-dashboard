@@ -4,6 +4,19 @@ enum AccountStatus {
   BANNED,
 }
 
+extension AccountStatusExtension on AccountStatus {
+  String get label {
+    switch (this) {
+      case AccountStatus.ACTIVE:
+        return 'Active';
+      case AccountStatus.INACTIVE:
+        return 'Inactive';
+      case AccountStatus.BANNED:
+        return 'Banned';
+    }
+  }
+}
+
 class Account {
   String id;
   String username;

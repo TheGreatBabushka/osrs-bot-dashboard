@@ -208,4 +208,59 @@ void main() {
       expect(find.byIcon(Icons.edit), findsNWidgets(3));
     });
   });
+
+  group('AccountsView - Edit Account', () {
+    testWidgets('Edit button should open edit dialog', (WidgetTester tester) async {
+      // Create a settings model
+      final settingsModel = SettingsModel();
+      
+      // Create an accounts model with an active account
+      final accountsModel = AccountsModel(settingsModel);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'test_user',
+          email: 'test@example.com',
+          status: AccountStatus.ACTIVE,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      // Create an activity model
+      final activityModel = AccountActivityModel(settingsModel);
+      
+      // Build the widget with all necessary providers
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<SettingsModel>.value(value: settingsModel),
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Verify the edit button is present
+      expect(find.byIcon(Icons.edit), findsOneWidget);
+      
+      // Tap the edit button
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pumpAndSettle();
+      
+      // Verify the edit dialog appears
+      expect(find.text('Edit Account'), findsOneWidget);
+      expect(find.text('Save Changes'), findsOneWidget);
+      
+      // Verify the form fields are pre-populated
+      expect(find.text('test_user'), findsOneWidget);
+      expect(find.text('test@example.com'), findsOneWidget);
+    });
+  });
 }

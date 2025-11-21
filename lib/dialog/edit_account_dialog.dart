@@ -2,26 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
 import 'package:osrs_bot_dashboard/api/api.dart';
 
-class AddAccountDialog extends StatefulWidget {
+class EditAccountDialog extends StatefulWidget {
+  final Account account;
   final String apiIp;
-  final VoidCallback onAccountAdded;
+  final VoidCallback onAccountUpdated;
 
-  const AddAccountDialog({
+  const EditAccountDialog({
     Key? key,
+    required this.account,
     required this.apiIp,
-    required this.onAccountAdded,
+    required this.onAccountUpdated,
   }) : super(key: key);
 
   @override
-  State<AddAccountDialog> createState() => _AddAccountDialogState();
+  State<EditAccountDialog> createState() => _EditAccountDialogState();
 }
 
-class _AddAccountDialogState extends State<AddAccountDialog> {
+class _EditAccountDialogState extends State<EditAccountDialog> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  late final TextEditingController _usernameController;
+  late final TextEditingController _emailController;
   bool _isSubmitting = false;
-  AccountStatus _selectedStatus = AccountStatus.ACTIVE;
+  late AccountStatus _selectedStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate with existing account data
+    _usernameController = TextEditingController(text: widget.account.username);
+    _emailController = TextEditingController(text: widget.account.email);
+    _selectedStatus = widget.account.status;
+  }
 
   @override
   void dispose() {
@@ -33,7 +44,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add New Account'),
+      title: const Text('Edit Account'),
       content: Form(
         key: _formKey,
         child: Column(
@@ -126,7 +137,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                     strokeWidth: 2,
                   ),
                 )
-              : const Text('Add Account'),
+              : const Text('Save Changes'),
         ),
       ],
     );
@@ -146,18 +157,18 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
 
-    final success = await api.createAccount(username, email, _selectedStatus);
+    final success = await api.updateAccount(widget.account.id, username, email, _selectedStatus);
 
     if (!mounted) return;
 
     if (success) {
       // Notify parent to refresh the accounts list
-      widget.onAccountAdded();
+      widget.onAccountUpdated();
 
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Account "$username" added successfully'),
+          content: Text('Account "$username" updated successfully'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 2),
         ),
@@ -169,7 +180,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to add account. Please try again.'),
+          content: Text('Failed to update account. Please try again.'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 3),
         ),

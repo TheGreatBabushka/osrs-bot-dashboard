@@ -96,7 +96,7 @@ class BotAPI {
    */
   Future<bool> createAccount(String username, String email, AccountStatus status) async {
     try {
-      // Convert status enum to string format expected by backend
+      // Convert status enum to string format expected by backend (e.g., 'active', 'inactive', 'banned')
       String statusString = status.name.toLowerCase();
 
       var response = await http.post(
@@ -115,6 +115,34 @@ class BotAPI {
       return false;
     } catch (e) {
       debugPrint('Error creating account: $e');
+      return false;
+    }
+  }
+
+  /*
+   * Updates an existing account
+   */
+  Future<bool> updateAccount(String id, String username, String email, AccountStatus status) async {
+    try {
+      // Convert status enum to string format expected by backend (e.g., 'active', 'inactive', 'banned')
+      String statusString = status.name.toLowerCase();
+
+      var response = await http.put(
+        Uri.parse("$baseUrl/accounts/$id"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "username": username,
+          "email": email,
+          "status": statusString,
+        }),
+      );
+
+      return response.statusCode == 200 || response.statusCode == 204;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+      return false;
+    } catch (e) {
+      debugPrint('Error updating account: $e');
       return false;
     }
   }
