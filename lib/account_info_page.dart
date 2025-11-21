@@ -151,76 +151,74 @@ class AccountInfoPage extends StatelessWidget {
   }
 
   Widget _buildActivityCard(BuildContext context) {
-    return Consumer<AccountActivityModel>(
-      builder: (context, activityModel, child) {
-        // Filter activities for this specific account
-        final accountActivities = activityModel.activities
-            .where((activity) => activity.accountId.toString() == account.id)
-            .toList();
+    final activityModel = Provider.of<AccountActivityModel>(context);
+    
+    // Filter activities for this specific account
+    final accountActivities = activityModel.activities
+        .where((activity) => activity.accountId.toString() == account.id)
+        .toList();
 
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Activity History',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: () => activityModel.fetchActivities(),
-                      tooltip: 'Refresh Activities',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (accountActivities.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.history,
-                            size: 48,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'No activity history',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: accountActivities.length,
-                    itemBuilder: (context, index) {
-                      final activity = accountActivities[index];
-                      return AccountActivityItem(
-                        account: account,
-                        activity: activity,
-                      );
-                    },
+                Text(
+                  'Activity History',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => activityModel.fetchActivities(),
+                  tooltip: 'Refresh Activities',
+                ),
               ],
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 16),
+            if (accountActivities.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.history,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No activity history',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: accountActivities.length,
+                itemBuilder: (context, index) {
+                  final activity = accountActivities[index];
+                  return AccountActivityItem(
+                    account: account,
+                    activity: activity,
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
