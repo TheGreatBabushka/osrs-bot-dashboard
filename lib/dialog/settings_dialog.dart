@@ -12,15 +12,25 @@ class SettingsDialog extends StatefulWidget {
 class _SettingsDialogState extends State<SettingsDialog> {
   late TextEditingController _apiIpController;
   bool _hasChanges = false;
+  String _initialApiIp = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_apiIpController.text.isEmpty) {
+      final settingsModel = Provider.of<SettingsModel>(context, listen: false);
+      _initialApiIp = settingsModel.apiIp;
+      _apiIpController.text = _initialApiIp;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    final settingsModel = Provider.of<SettingsModel>(context, listen: false);
-    _apiIpController = TextEditingController(text: settingsModel.apiIp);
+    _apiIpController = TextEditingController();
     _apiIpController.addListener(() {
       setState(() {
-        _hasChanges = _apiIpController.text != settingsModel.apiIp;
+        _hasChanges = _apiIpController.text != _initialApiIp;
       });
     });
   }
@@ -70,7 +80,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
             TextButton(
               onPressed: () async {
                 await settingsModel.resetToDefault();
-                _apiIpController.text = settingsModel.apiIp;
+                if (mounted) {
+                  _apiIpController.text = settingsModel.apiIp;
+                  _initialApiIp = settingsModel.apiIp;
+                }
               },
               child: const Text('Reset to Default'),
             ),
