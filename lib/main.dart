@@ -95,6 +95,16 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Accounts',
+            onPressed: () {
+              final accountsModel = Provider.of<AccountsModel>(context, listen: false);
+              final activityModel = Provider.of<AccountActivityModel>(context, listen: false);
+              accountsModel.fetchAccounts();
+              activityModel.fetchActivities();
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.code),
             tooltip: 'Manage Scripts',
             onPressed: () {
