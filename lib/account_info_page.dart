@@ -60,7 +60,7 @@ class AccountInfoPage extends StatelessWidget {
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -109,7 +109,7 @@ class AccountInfoPage extends StatelessWidget {
               'Status',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
