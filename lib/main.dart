@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/accounts_view.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
 import 'package:osrs_bot_dashboard/dialog/add_account_dialog.dart';
+import 'package:osrs_bot_dashboard/dialog/scripts_dialog.dart';
 import 'package:osrs_bot_dashboard/dialog/settings_dialog.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
+import 'package:osrs_bot_dashboard/state/scripts_model.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
 import 'package:provider/provider.dart';
 
@@ -85,6 +87,7 @@ class MyApp extends StatelessWidget {
 
           return MultiProvider(
             providers: [
+              ChangeNotifierProvider(create: (context) => ScriptsModel()),
               ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
               ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
             ],
@@ -128,6 +131,16 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.code),
+            tooltip: 'Manage Scripts',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const ScriptsDialog(),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Settings',
