@@ -32,8 +32,9 @@ void main() {
       
       // Add a new script
       final newScript = Script(name: 'TestScript', parameters: 'param1 param2');
-      await model.addScript(newScript);
+      final success = await model.addScript(newScript);
       
+      expect(success, isTrue);
       expect(model.scripts.length, equals(initialCount + 1));
       expect(model.scripts.last.name, equals('TestScript'));
       expect(model.scripts.last.parameters, equals('param1 param2'));
@@ -64,9 +65,10 @@ void main() {
       
       // Try to add a script with a duplicate name
       final duplicateScript = Script(name: 'NewbTrainer', parameters: 'test');
-      await model.addScript(duplicateScript);
+      final success = await model.addScript(duplicateScript);
       
-      // Count should not change
+      // Should return false and count should not change
+      expect(success, isFalse);
       expect(model.scripts.length, equals(initialCount));
     });
 
@@ -81,7 +83,9 @@ void main() {
         name: 'NewbTrainerV2',
         parameters: 'updated params',
       );
-      await model.updateScript('NewbTrainer', updatedScript);
+      final success = await model.updateScript('NewbTrainer', updatedScript);
+      
+      expect(success, isTrue);
       
       final script = model.getScript('NewbTrainerV2');
       expect(script, isNotNull);
@@ -90,6 +94,33 @@ void main() {
       
       // Old name should not exist
       expect(model.getScript('NewbTrainer'), isNull);
+    });
+
+    test('update returns false for non-existent script', () async {
+      final model = ScriptsModel();
+      
+      // Wait for the model to load
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      final updatedScript = Script(name: 'NonExistent', parameters: 'test');
+      final success = await model.updateScript('DoesNotExist', updatedScript);
+      
+      expect(success, isFalse);
+    });
+
+    test('update returns false when new name conflicts with existing script', () async {
+      final model = ScriptsModel();
+      
+      // Wait for the model to load
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      // Try to rename NewbTrainer to KillerCowhideTanner (which already exists)
+      final updatedScript = Script(name: 'KillerCowhideTanner');
+      final success = await model.updateScript('NewbTrainer', updatedScript);
+      
+      expect(success, isFalse);
+      // Original script should still exist
+      expect(model.getScript('NewbTrainer'), isNotNull);
     });
 
     test('can delete a script', () async {

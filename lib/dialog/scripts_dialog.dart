@@ -22,7 +22,7 @@ class _ScriptsDialogState extends State<ScriptsDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
+            Flexible(
               child: scriptsModel.scripts.isEmpty
                   ? const Center(child: Text('No scripts defined'))
                   : ListView.builder(
@@ -104,7 +104,7 @@ class _ScriptsDialogState extends State<ScriptsDialog> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final name = nameController.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -119,8 +119,19 @@ class _ScriptsDialogState extends State<ScriptsDialog> {
                 parameters: parameters.isEmpty ? null : parameters,
               );
 
-              Provider.of<ScriptsModel>(context, listen: false).addScript(script);
-              Navigator.of(context).pop();
+              final success = await Provider.of<ScriptsModel>(context, listen: false).addScript(script);
+              if (!success) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('A script with this name already exists')),
+                  );
+                }
+                return;
+              }
+              
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
             child: const Text('Add'),
           ),
@@ -163,7 +174,7 @@ class _ScriptsDialogState extends State<ScriptsDialog> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final name = nameController.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -178,9 +189,21 @@ class _ScriptsDialogState extends State<ScriptsDialog> {
                 parameters: parameters.isEmpty ? null : parameters,
               );
 
-              Provider.of<ScriptsModel>(context, listen: false)
+              final success = await Provider.of<ScriptsModel>(context, listen: false)
                   .updateScript(script.name, newScript);
-              Navigator.of(context).pop();
+              
+              if (!success) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Failed to update script. Name may already exist.')),
+                  );
+                }
+                return;
+              }
+              
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
             child: const Text('Save'),
           ),

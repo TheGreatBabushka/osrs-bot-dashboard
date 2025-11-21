@@ -62,35 +62,37 @@ class ScriptsModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addScript(Script script) async {
+  Future<bool> addScript(Script script) async {
     // Check for duplicate names
     if (_scripts.any((s) => s.name == script.name)) {
       debugPrint('Script with name "${script.name}" already exists');
-      return;
+      return false;
     }
 
     _scripts.add(script);
     await _saveScripts();
     notifyListeners();
+    return true;
   }
 
-  Future<void> updateScript(String oldName, Script newScript) async {
+  Future<bool> updateScript(String oldName, Script newScript) async {
     final index = _scripts.indexWhere((s) => s.name == oldName);
     if (index == -1) {
       debugPrint('Script with name "$oldName" not found');
-      return;
+      return false;
     }
 
     // Check if new name conflicts with existing script (excluding the one being updated)
     if (oldName != newScript.name && 
         _scripts.any((s) => s.name == newScript.name)) {
       debugPrint('Script with name "${newScript.name}" already exists');
-      return;
+      return false;
     }
 
     _scripts[index] = newScript;
     await _saveScripts();
     notifyListeners();
+    return true;
   }
 
   Future<void> deleteScript(String name) async {
@@ -100,10 +102,11 @@ class ScriptsModel extends ChangeNotifier {
   }
 
   Script? getScript(String name) {
-    try {
-      return _scripts.firstWhere((s) => s.name == name);
-    } catch (e) {
-      return null;
+    for (var script in _scripts) {
+      if (script.name == name) {
+        return script;
+      }
     }
+    return null;
   }
 }
