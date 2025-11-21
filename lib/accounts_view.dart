@@ -99,11 +99,7 @@ class AccountsView extends StatelessWidget {
 
         // Show list of accounts with pull-to-refresh
         return RefreshIndicator(
-          onRefresh: () async {
-            accountsModel.fetchAccounts();
-            // Wait a bit to ensure the UI updates
-            await Future.delayed(const Duration(milliseconds: 500));
-          },
+          onRefresh: () => accountsModel.fetchAccounts(),
           child: ListView.builder(
             itemCount: accountsModel.accounts.length,
             itemBuilder: (context, index) {

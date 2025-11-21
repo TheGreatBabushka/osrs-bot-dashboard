@@ -35,7 +35,7 @@ class AccountsModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchAccounts() async {
+  Future<void> fetchAccounts() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -67,7 +67,7 @@ class AccountsModel extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       log("Error fetching accounts: $e");
-      _errorMessage = "An unexpected error occurred: ${e.toString()}";
+      _errorMessage = "An unexpected error occurred. Please try again later.";
     } finally {
       _isLoading = false;
       notifyListeners();
