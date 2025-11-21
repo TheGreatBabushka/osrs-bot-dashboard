@@ -18,7 +18,7 @@ else
     echo "Installing Flutter SDK..."
     
     # Clone Flutter from GitHub (stable branch)
-    cd $HOME
+    cd "$HOME"
     if git clone https://github.com/flutter/flutter.git -b stable --depth 1; then
         echo "✓ Flutter cloned successfully to $FLUTTER_DIR"
     else
@@ -46,8 +46,11 @@ $FLUTTER_DIR/bin/flutter --version 2>&1 | head -20 || echo "Note: Flutter will c
 # Install project dependencies
 if [ -f "pubspec.yaml" ]; then
     echo "Installing project dependencies..."
-    $FLUTTER_DIR/bin/flutter pub get
-    echo "Dependencies installed successfully!"
+    if $FLUTTER_DIR/bin/flutter pub get; then
+        echo "✓ Dependencies installed successfully!"
+    else
+        echo "⚠ Warning: Failed to install dependencies. You may need to run 'flutter pub get' manually."
+    fi
 else
     echo "Warning: pubspec.yaml not found in current directory"
 fi
