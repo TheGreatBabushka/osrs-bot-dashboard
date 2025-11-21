@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/account_info_page.dart';
+import 'package:osrs_bot_dashboard/dialog/edit_account_dialog.dart';
 import 'package:osrs_bot_dashboard/dialog/start_bot_dialog.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
 import 'package:provider/provider.dart';
 
 import 'api/account.dart';
@@ -126,9 +128,7 @@ class AccountsView extends StatelessWidget {
                       ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    // TODO: Implement edit functionality
-                  },
+                  onPressed: () => _showEditAccountDialog(context, account),
                   tooltip: 'Edit Account',
                 ),
                 title: Text(account.username),
@@ -262,6 +262,24 @@ class AccountsView extends StatelessWidget {
       context: context,
       builder: (context) {
         return StartBotDialog(account: account);
+      },
+    );
+  }
+
+  void _showEditAccountDialog(BuildContext context, Account account) {
+    final settingsModel = Provider.of<SettingsModel>(context, listen: false);
+    final accountsModel = Provider.of<AccountsModel>(context, listen: false);
+    
+    showDialog(
+      context: context,
+      builder: (_) {
+        return EditAccountDialog(
+          account: account,
+          apiIp: settingsModel.apiIp,
+          onAccountUpdated: () {
+            accountsModel.fetchAccounts();
+          },
+        );
       },
     );
   }
