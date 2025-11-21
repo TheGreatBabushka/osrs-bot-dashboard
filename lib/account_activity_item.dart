@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
 
@@ -34,7 +35,26 @@ class _AccountActivityItemState extends State<AccountActivityItem> {
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Parameters:'),
-        Text(commandParts.skip(1).join(' ')),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(commandParts.skip(1).join(' ')),
+            // copy to clipboard button
+            IconButton(
+              icon: const Icon(Icons.copy),
+              tooltip: 'Copy Parameters to Clipboard',
+              onPressed: () {
+                var params = commandParts.skip(1).join(' ');
+                Clipboard.setData(ClipboardData(text: params));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Parameters copied to clipboard'),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ],
     );
   }
