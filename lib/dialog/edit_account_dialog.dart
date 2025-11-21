@@ -51,6 +51,7 @@ class _EditAccountDialogState extends State<EditAccountDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
+              readOnly: true,
               controller: _usernameController,
               decoration: const InputDecoration(
                 labelText: 'Username',
@@ -70,6 +71,7 @@ class _EditAccountDialogState extends State<EditAccountDialog> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              readOnly: true,
               controller: _emailController,
               decoration: const InputDecoration(
                 labelText: 'Email',
