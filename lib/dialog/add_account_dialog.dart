@@ -8,7 +8,7 @@ class AddAccountDialog extends StatefulWidget {
   const AddAccountDialog({Key? key}) : super(key: key);
 
   @override
-  _AddAccountDialogState createState() => _AddAccountDialogState();
+  State<AddAccountDialog> createState() => _AddAccountDialogState();
 }
 
 class _AddAccountDialogState extends State<AddAccountDialog> {
@@ -64,8 +64,11 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                 if (value == null || value.trim().isEmpty) {
                   return 'Email is required';
                 }
-                // Basic email validation
-                if (!value.contains('@') || !value.contains('.')) {
+                // Email validation regex pattern
+                final emailRegex = RegExp(
+                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                );
+                if (!emailRegex.hasMatch(value.trim())) {
                   return 'Please enter a valid email address';
                 }
                 return null;
