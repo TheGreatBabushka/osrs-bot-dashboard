@@ -18,7 +18,7 @@ else
     echo "Installing Flutter SDK..."
     
     # Clone Flutter from GitHub (stable branch)
-    cd "$HOME"
+    cd "$HOME" || { echo "✗ Error: Cannot change to home directory"; exit 1; }
     if git clone https://github.com/flutter/flutter.git -b stable --depth 1; then
         echo "✓ Flutter cloned successfully to $FLUTTER_DIR"
     else
@@ -41,6 +41,7 @@ $FLUTTER_DIR/bin/flutter config --enable-web 2>/dev/null || true
 # Verify Flutter installation
 echo "Verifying Flutter installation..."
 echo "(Note: Initial setup may require downloading Dart SDK...)"
+# Limit output to first 20 lines to avoid verbose output while still showing version info
 $FLUTTER_DIR/bin/flutter --version 2>&1 | head -20 || echo "Note: Flutter will complete setup on first use"
 
 # Install project dependencies
