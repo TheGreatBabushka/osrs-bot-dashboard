@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
+import 'package:osrs_bot_dashboard/model/activity_model.dart';
+import 'package:osrs_bot_dashboard/account_activity_item.dart';
+import 'package:provider/provider.dart';
 
 class AccountInfoPage extends StatelessWidget {
   final Account account;
@@ -15,34 +18,38 @@ class AccountInfoPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Account Information',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Account Information',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildInfoRow(context, 'Username', account.username),
-                    const Divider(),
-                    _buildInfoRow(context, 'Email', account.email),
-                    const Divider(),
-                    _buildInfoRow(context, 'Account ID', account.id),
-                    const Divider(),
-                    _buildStatusRow(context),
-                  ],
+                      const SizedBox(height: 16),
+                      _buildInfoRow(context, 'Username', account.username),
+                      const Divider(),
+                      _buildInfoRow(context, 'Email', account.email),
+                      const Divider(),
+                      _buildInfoRow(context, 'Account ID', account.id),
+                      const Divider(),
+                      _buildStatusRow(context),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildActivityCard(context),
+            ],
+          ),
         ),
       ),
     );
@@ -139,6 +146,78 @@ class AccountInfoPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActivityCard(BuildContext context) {
+    final activityModel = Provider.of<AccountActivityModel>(context);
+    
+    // Filter activities for this specific account
+    final accountActivities = activityModel.activities
+        .where((activity) => activity.accountId.toString() == account.id)
+        .toList();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Activity History',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => activityModel.fetchActivities(),
+                  tooltip: 'Refresh Activities',
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (accountActivities.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.history,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No activity history',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: accountActivities.length,
+                itemBuilder: (context, index) {
+                  final activity = accountActivities[index];
+                  return AccountActivityItem(
+                    account: account,
+                    activity: activity,
+                  );
+                },
+              ),
+          ],
+        ),
       ),
     );
   }

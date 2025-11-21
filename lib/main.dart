@@ -59,16 +59,48 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => SettingsModel(),
-      child: MaterialApp(
-        title: 'OSRS Bot Dashboard',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.green.shade500,
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-        ),
-        home: const MyHomePage(title: 'OSRS Bot Dashboard'),
+      child: Consumer<SettingsModel>(
+        builder: (context, settingsModel, child) {
+          if (settingsModel.isLoading) {
+            return MaterialApp(
+              title: 'OSRS Bot Dashboard',
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Colors.green.shade500,
+                  brightness: Brightness.dark,
+                ),
+                useMaterial3: true,
+              ),
+              home: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  title: const Text('OSRS Bot Dashboard'),
+                ),
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
+          }
+
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
+              ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
+            ],
+            child: MaterialApp(
+              title: 'OSRS Bot Dashboard',
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Colors.green.shade500,
+                  brightness: Brightness.dark,
+                ),
+                useMaterial3: true,
+              ),
+              home: const MyHomePage(title: 'OSRS Bot Dashboard'),
+            ),
+          );
+        },
       ),
     );
   }
@@ -91,67 +123,45 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsModel>(
-      builder: (context, settingsModel, child) {
-        if (settingsModel.isLoading) {
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: Text(widget.title),
-            ),
-            body: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
-            ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
-          ],
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: Text(widget.title),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.settings),
-                  tooltip: 'Settings',
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const SettingsDialog(),
-                    );
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const SettingsDialog(),
+              );
+            },
+          ),
+        ],
+      ),
+      body: const AccountsView(),
+      floatingActionButton: Builder(
+        builder: (BuildContext scaffoldContext) {
+          return FloatingActionButton(
+            onPressed: () {
+              final settingsModel = Provider.of<SettingsModel>(scaffoldContext, listen: false);
+              final accountsModel = Provider.of<AccountsModel>(scaffoldContext, listen: false);
+              showDialog(
+                context: scaffoldContext,
+                builder: (_) => AddAccountDialog(
+                  apiIp: settingsModel.apiIp,
+                  onAccountAdded: () {
+                    accountsModel.fetchAccounts();
                   },
                 ),
-              ],
-            ),
-            body: const AccountsView(),
-            floatingActionButton: Builder(
-              builder: (BuildContext scaffoldContext) {
-                return FloatingActionButton(
-                  onPressed: () {
-                    final accountsModel =
-                        Provider.of<AccountsModel>(scaffoldContext, listen: false);
-                    showDialog(
-                      context: scaffoldContext,
-                      builder: (_) => AddAccountDialog(
-                        apiIp: settingsModel.apiIp,
-                        onAccountAdded: () {
-                          accountsModel.fetchAccounts();
-                        },
-                      ),
-                    );
-                  },
-                  tooltip: 'Add Account',
-                  child: const Icon(Icons.add),
-                );
-              },
-            ),
-          ),
-        );
-      },
+              );
+            },
+            tooltip: 'Add Account',
+            child: const Icon(Icons.add),
+          );
+        },
+      ),
     );
   }
 }
