@@ -18,7 +18,7 @@ class Account {
       username: json['username'],
       email: json['email'],
       status: AccountStatus.values.firstWhere(
-        (element) => element.toString().toLowerCase() == json['status'],
+        (element) => element.name.toLowerCase() == json['status']?.toString().toLowerCase(),
         orElse: () => AccountStatus.ACTIVE,
       ),
     );

@@ -119,7 +119,7 @@ class AccountsView extends StatelessWidget {
                   tooltip: 'Edit Account',
                 ),
                 title: Text(account.username),
-                subtitle: Text(account.id),
+                subtitle: Text('${account.id} • ${_getStatusLabel(account.status)}'),
                 onTap: () => _navigateToAccountInfo(context, account),
               );
             },
@@ -127,6 +127,19 @@ class AccountsView extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _getStatusLabel(AccountStatus status) {
+    switch (status) {
+      case AccountStatus.ACTIVE:
+        return 'Active';
+      case AccountStatus.INACTIVE:
+        return 'Inactive';
+      case AccountStatus.BANNED:
+        return 'Banned';
+      default:
+        return 'Unknown';
+    }
   }
 
   void _showStartBotDialog(BuildContext context, Account account) {

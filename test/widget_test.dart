@@ -38,4 +38,36 @@ void main() {
     expect(find.text('API Server Configuration'), findsOneWidget);
     expect(find.text('API IP Address'), findsOneWidget);
   });
+
+  testWidgets('Add Account FAB exists', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
+    
+    // Wait for the app to load
+    await tester.pumpAndSettle();
+
+    // Verify that the add account FAB exists
+    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(find.byTooltip('Add Account'), findsOneWidget);
+  });
+
+  testWidgets('Add Account dialog can be opened', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
+    
+    // Wait for the app to load
+    await tester.pumpAndSettle();
+
+    // Tap the add account FAB
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    // Verify that the add account dialog is shown
+    expect(find.text('Add New Account'), findsOneWidget);
+    expect(find.text('Username'), findsOneWidget);
+    expect(find.text('Email'), findsOneWidget);
+    expect(find.text('Account Status'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.text('Add Account'), findsOneWidget);
+  });
 }

@@ -90,4 +90,32 @@ class BotAPI {
       client.close();
     }
   }
+
+  /*
+   * Creates a new account
+   */
+  Future<bool> createAccount(String username, String email, AccountStatus status) async {
+    try {
+      // Convert status enum to string format expected by backend
+      String statusString = status.name.toLowerCase();
+      
+      var response = await http.post(
+        Uri.parse("$baseUrl/accounts"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "username": username,
+          "email": email,
+          "status": statusString,
+        }),
+      );
+      
+      return response.statusCode == 200 || response.statusCode == 201;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+      return false;
+    } catch (e) {
+      debugPrint('Error creating account: $e');
+      return false;
+    }
+  }
 }

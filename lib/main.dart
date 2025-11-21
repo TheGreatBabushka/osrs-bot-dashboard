@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/accounts_view.dart';
 import 'package:osrs_bot_dashboard/dashboard.dart';
+import 'package:osrs_bot_dashboard/dialog/add_account_dialog.dart';
 import 'package:osrs_bot_dashboard/dialog/settings_dialog.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
@@ -90,40 +91,66 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Settings',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const SettingsDialog(),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Consumer<SettingsModel>(
-        builder: (context, settingsModel, child) {
-          if (settingsModel.isLoading) {
-            return const Center(
+    return Consumer<SettingsModel>(
+      builder: (context, settingsModel, child) {
+        if (settingsModel.isLoading) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: Text(widget.title),
+            ),
+            body: const Center(
               child: CircularProgressIndicator(),
-            );
-          }
-          
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
-              ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
-            ],
-            child: const AccountsView(),
+            ),
           );
-        },
-      ),
+        }
+        
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => AccountsModel(settingsModel)),
+            ChangeNotifierProvider(create: (context) => AccountActivityModel(settingsModel)),
+          ],
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: Text(widget.title),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  tooltip: 'Settings',
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const SettingsDialog(),
+                    );
+                  },
+                ),
+              ],
+            ),
+            body: const AccountsView(),
+            floatingActionButton: Builder(
+              builder: (BuildContext scaffoldContext) {
+                return FloatingActionButton(
+                  onPressed: () {
+                    final accountsModel = Provider.of<AccountsModel>(scaffoldContext, listen: false);
+                    showDialog(
+                      context: scaffoldContext,
+                      builder: (_) => AddAccountDialog(
+                        apiIp: settingsModel.apiIp,
+                        onAccountAdded: () {
+                          accountsModel.fetchAccounts();
+                        },
+                      ),
+                    );
+                  },
+                  tooltip: 'Add Account',
+                  child: const Icon(Icons.add),
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }
