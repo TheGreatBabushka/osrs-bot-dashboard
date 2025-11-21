@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:osrs_bot_dashboard/api/account.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
 import 'package:osrs_bot_dashboard/api/bot_provider.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
@@ -16,6 +17,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   bool _isSubmitting = false;
+  AccountStatus _selectedStatus = AccountStatus.ACTIVE;
 
   @override
   void dispose() {
@@ -75,6 +77,29 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
               },
               enabled: !_isSubmitting,
             ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<AccountStatus>(
+              value: _selectedStatus,
+              decoration: const InputDecoration(
+                labelText: 'Account Status',
+                border: OutlineInputBorder(),
+              ),
+              items: AccountStatus.values.map((AccountStatus status) {
+                return DropdownMenuItem<AccountStatus>(
+                  value: status,
+                  child: Text(_getStatusLabel(status)),
+                );
+              }).toList(),
+              onChanged: _isSubmitting
+                  ? null
+                  : (AccountStatus? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _selectedStatus = newValue;
+                        });
+                      }
+                    },
+            ),
           ],
         ),
       ),
@@ -119,7 +144,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
 
-    final success = await api.createAccount(username, email);
+    final success = await api.createAccount(username, email, _selectedStatus);
 
     if (!mounted) return;
 
@@ -147,6 +172,17 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
           duration: Duration(seconds: 3),
         ),
       );
+    }
+  }
+
+  String _getStatusLabel(AccountStatus status) {
+    switch (status) {
+      case AccountStatus.ACTIVE:
+        return 'Active';
+      case AccountStatus.INACTIVE:
+        return 'Inactive';
+      case AccountStatus.BANNED:
+        return 'Banned';
     }
   }
 }

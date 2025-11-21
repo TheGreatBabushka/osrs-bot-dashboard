@@ -94,12 +94,19 @@ class BotAPI {
   /*
    * Creates a new account
    */
-  Future<bool> createAccount(String username, String email) async {
+  Future<bool> createAccount(String username, String email, AccountStatus status) async {
     try {
+      // Convert status enum to string format expected by backend
+      String statusString = status.toString().split('.').last.toLowerCase();
+      
       var response = await http.post(
         Uri.parse("$baseUrl/accounts"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"username": username, "email": email}),
+        body: jsonEncode({
+          "username": username,
+          "email": email,
+          "status": statusString,
+        }),
       );
       
       return response.statusCode == 200 || response.statusCode == 201;

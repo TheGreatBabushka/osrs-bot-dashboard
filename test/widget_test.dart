@@ -66,6 +66,7 @@ void main() {
     expect(find.text('Add New Account'), findsOneWidget);
     expect(find.text('Username'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
+    expect(find.text('Account Status'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
     expect(find.text('Add Account'), findsOneWidget);
   });
