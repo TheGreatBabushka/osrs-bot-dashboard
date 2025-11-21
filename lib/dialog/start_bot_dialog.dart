@@ -67,8 +67,9 @@ class _StartBotDialogState extends State<StartBotDialog> {
       actions: [
         ElevatedButton(
           onPressed: () {
-            _startBot();
-            Navigator.of(context).pop();
+            if (_startBot()) {
+              Navigator.of(context).pop();
+            }
           },
           child: Text('Run'),
         ),
@@ -82,10 +83,17 @@ class _StartBotDialogState extends State<StartBotDialog> {
     );
   }
 
-  void _startBot() {
-    // Implement your bot start/run logic here.
-    // This function will be called when the "Start/Run" button is pressed.
-    // For this example, it's left empty as you requested.
+  bool _startBot() {
+    // Validate that a script is selected
+    if (selectedScript.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a script before starting the bot'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
 
     final settingsModel = Provider.of<SettingsModel>(context, listen: false);
     final api = BotAPI(settingsModel.apiIp);
@@ -95,5 +103,7 @@ class _StartBotDialogState extends State<StartBotDialog> {
       selectedScript,
       parametersController.text.split(' '),
     );
+    
+    return true;
   }
 }
