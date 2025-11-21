@@ -76,25 +76,31 @@ class AccountInfoPage extends StatelessWidget {
   }
 
   Widget _buildStatusRow(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     Color statusColor;
     IconData statusIcon;
     String statusText;
 
     switch (account.status) {
       case AccountStatus.ACTIVE:
-        statusColor = Colors.green;
+        statusColor = colorScheme.primary;
         statusIcon = Icons.check_circle;
         statusText = 'Active';
         break;
       case AccountStatus.INACTIVE:
-        statusColor = Colors.grey;
+        statusColor = colorScheme.onSurfaceVariant;
         statusIcon = Icons.pause_circle;
         statusText = 'Inactive';
         break;
       case AccountStatus.BANNED:
-        statusColor = Colors.red;
+        statusColor = colorScheme.error;
         statusIcon = Icons.cancel;
         statusText = 'Banned';
+        break;
+      default:
+        statusColor = colorScheme.onSurfaceVariant;
+        statusIcon = Icons.help_outline;
+        statusText = 'Unknown';
         break;
     }
 
