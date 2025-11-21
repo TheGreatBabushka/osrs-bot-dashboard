@@ -142,19 +142,6 @@ class AccountsView extends StatelessWidget {
     );
   }
 
-  String _getStatusLabel(AccountStatus status) {
-    switch (status) {
-      case AccountStatus.ACTIVE:
-        return 'Active';
-      case AccountStatus.INACTIVE:
-        return 'Inactive';
-      case AccountStatus.BANNED:
-        return 'Banned';
-      default:
-        return 'Unknown';
-    }
-  }
-
   AccountActivity? _getActivityForAccount(AccountActivityModel activityModel, Account account) {
     try {
       return activityModel.activities.firstWhere(
@@ -184,7 +171,7 @@ class AccountsView extends StatelessWidget {
   }
 
   Widget _buildAccountSubtitle(Account account, AccountActivity? activity) {
-    var statusText = '${account.id} • ${_getStatusLabel(account.status)}';
+    var statusText = '${account.id} • ${account.status.label}';
 
     if (activity != null && _isAccountRunning(activity)) {
       var command = activity.command;

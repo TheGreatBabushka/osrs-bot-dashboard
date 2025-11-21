@@ -102,7 +102,7 @@ class _EditAccountDialogState extends State<EditAccountDialog> {
               items: AccountStatus.values.map((AccountStatus status) {
                 return DropdownMenuItem<AccountStatus>(
                   value: status,
-                  child: Text(_getStatusLabel(status)),
+                  child: Text(status.label),
                 );
               }).toList(),
               onChanged: _isSubmitting
@@ -185,17 +185,6 @@ class _EditAccountDialogState extends State<EditAccountDialog> {
           duration: Duration(seconds: 3),
         ),
       );
-    }
-  }
-
-  String _getStatusLabel(AccountStatus status) {
-    switch (status) {
-      case AccountStatus.ACTIVE:
-        return 'Active';
-      case AccountStatus.INACTIVE:
-        return 'Inactive';
-      case AccountStatus.BANNED:
-        return 'Banned';
     }
   }
 }
