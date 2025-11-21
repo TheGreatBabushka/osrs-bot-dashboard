@@ -36,12 +36,17 @@ class SettingsModel extends ChangeNotifier {
       return;
     }
 
-    _apiIp = newApiIp;
-    notifyListeners();
+    // Basic URL validation
+    if (!newApiIp.startsWith('http://') && !newApiIp.startsWith('https://')) {
+      debugPrint('Error: API IP must start with http:// or https://');
+      return;
+    }
 
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_apiIpKey, newApiIp);
+      _apiIp = newApiIp;
+      notifyListeners();
     } catch (e) {
       debugPrint('Error saving API IP: $e');
     }

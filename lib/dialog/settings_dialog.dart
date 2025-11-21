@@ -99,7 +99,23 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ElevatedButton(
               onPressed: _hasChanges
                   ? () async {
-                      await settingsModel.setApiIp(_apiIpController.text.trim());
+                      final newApiIp = _apiIpController.text.trim();
+                      
+                      // Validate URL format
+                      if (!newApiIp.startsWith('http://') && !newApiIp.startsWith('https://')) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('URL must start with http:// or https://'),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                        return;
+                      }
+                      
+                      await settingsModel.setApiIp(newApiIp);
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(

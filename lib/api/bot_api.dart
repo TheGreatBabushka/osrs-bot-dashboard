@@ -80,11 +80,11 @@ class BotAPI {
   /*
    * Starts a bot with the given username
    */
-  void startBot(String id, String script, List<String> args) {
+  Future<void> startBot(String id, String script, List<String> args) async {
     log('starting bot $id with script $script and args $args');
     var client = http.Client();
     try {
-      client.post(Uri.parse("$baseUrl/bots"),
+      await client.post(Uri.parse("$baseUrl/bots"),
           body: jsonEncode({"id": id, "script": script, "args": args}));
     } finally {
       client.close();
