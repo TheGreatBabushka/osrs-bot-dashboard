@@ -109,7 +109,7 @@ class BotAPI {
         }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.created;
     } on SocketException catch (e) {
       debugPrint(e.toString());
       return false;
@@ -137,12 +137,32 @@ class BotAPI {
         }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 204;
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.noContent;
     } on SocketException catch (e) {
       debugPrint(e.toString());
       return false;
     } catch (e) {
       debugPrint('Error updating account: $e');
+      return false;
+    }
+  }
+
+  /*
+   * Deletes an account
+   */
+  Future<bool> deleteAccount(String id) async {
+    try {
+      var response = await http.delete(
+        Uri.parse("$baseUrl/accounts/$id"),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.noContent;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+      return false;
+    } catch (e) {
+      debugPrint('Error deleting account: $e');
       return false;
     }
   }

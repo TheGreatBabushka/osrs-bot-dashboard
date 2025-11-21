@@ -129,6 +129,13 @@ class _EditAccountDialogState extends State<EditAccountDialog> {
                 },
           child: const Text('Cancel'),
         ),
+        TextButton(
+          onPressed: _isSubmitting ? null : _handleDelete,
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.red,
+          ),
+          child: const Text('Delete'),
+        ),
         ElevatedButton(
           onPressed: _isSubmitting ? null : _handleSubmit,
           child: _isSubmitting
@@ -183,6 +190,69 @@ class _EditAccountDialogState extends State<EditAccountDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to update account. Please try again.'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleDelete() async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: Text(
+          'Are you sure you want to delete the account "${widget.account.username}"? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final api = BotAPI(widget.apiIp);
+    final success = await api.deleteAccount(widget.account.id);
+
+    if (!mounted) return;
+
+    if (success) {
+      // Notify parent to refresh the accounts list
+      widget.onAccountUpdated();
+
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Account "${widget.account.username}" deleted successfully'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      setState(() {
+        _isSubmitting = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete account. Please try again.'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 3),
         ),

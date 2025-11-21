@@ -103,40 +103,63 @@ class AccountsView extends StatelessWidget {
         }
 
         // Show list of accounts with pull-to-refresh
-        return RefreshIndicator(
-          onRefresh: () async {
-            await accountsModel.fetchAccounts();
-            activityModel.fetchActivities();
-          },
-          child: ListView.builder(
-            itemCount: accountsModel.accounts.length,
-            itemBuilder: (context, index) {
-              var account = accountsModel.accounts[index];
-              var activity = _getActivityForAccount(activityModel, account);
-              var isRunning = _isAccountRunning(activity);
+        return Column(
+          children: [
+            // Toggle for showing/hiding banned accounts
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  const Text('Show Banned Accounts'),
+                  const Spacer(),
+                  Switch(
+                    value: accountsModel.showBannedAccounts,
+                    onChanged: (value) {
+                      accountsModel.setShowBannedAccounts(value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await accountsModel.fetchAccounts();
+                  activityModel.fetchActivities();
+                },
+                child: ListView.builder(
+                  itemCount: accountsModel.accounts.length,
+                  itemBuilder: (context, index) {
+                    var account = accountsModel.accounts[index];
+                    var activity = _getActivityForAccount(activityModel, account);
+                    var isRunning = _isAccountRunning(activity);
 
-              return ListTile(
-                leading: account.status == AccountStatus.BANNED
-                    ? const IconButton(onPressed: null, icon: Icon(Icons.block, color: Colors.red))
-                    : IconButton(
-                        icon: Icon(
-                          isRunning ? Icons.stop_circle : Icons.play_circle,
-                          color: isRunning ? Colors.red : Colors.green,
-                        ),
-                        onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
-                        tooltip: isRunning ? 'Bot Running' : 'Start Bot',
+                    return ListTile(
+                      leading: account.status == AccountStatus.BANNED
+                          ? const IconButton(onPressed: null, icon: Icon(Icons.block, color: Colors.red))
+                          : IconButton(
+                              icon: Icon(
+                                isRunning ? Icons.stop_circle : Icons.play_circle,
+                                color: isRunning ? Colors.red : Colors.green,
+                              ),
+                              onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
+                              tooltip: isRunning ? 'Bot Running' : 'Start Bot',
+                            ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _showEditAccountDialog(context, account),
+                        tooltip: 'Edit Account',
                       ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditAccountDialog(context, account),
-                  tooltip: 'Edit Account',
+                      title: Text(account.username),
+                      subtitle: _buildAccountSubtitle(account, activity),
+                      onTap: () => _navigateToAccountInfo(context, account),
+                    );
+                  },
                 ),
-                title: Text(account.username),
-                subtitle: _buildAccountSubtitle(account, activity),
-                onTap: () => _navigateToAccountInfo(context, account),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         );
       },
     );

@@ -14,7 +14,7 @@ void main() {
       final settingsModel = SettingsModel();
       
       // Create an accounts model with a banned account
-      final accountsModel = AccountsModel(settingsModel);
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
       accountsModel.accounts = [
         Account(
           id: '1',
@@ -26,7 +26,7 @@ void main() {
       accountsModel.isLoading = false;
       
       // Create an activity model
-      final activityModel = AccountActivityModel(settingsModel);
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
       
       // Build the widget with providers
       await tester.pumpWidget(
@@ -61,7 +61,7 @@ void main() {
       final settingsModel = SettingsModel();
       
       // Create an accounts model with an active account
-      final accountsModel = AccountsModel(settingsModel);
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
       accountsModel.accounts = [
         Account(
           id: '2',
@@ -73,7 +73,7 @@ void main() {
       accountsModel.isLoading = false;
       
       // Create an activity model
-      final activityModel = AccountActivityModel(settingsModel);
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
       
       // Build the widget with providers
       await tester.pumpWidget(
@@ -107,7 +107,7 @@ void main() {
       final settingsModel = SettingsModel();
       
       // Create an accounts model with an inactive account
-      final accountsModel = AccountsModel(settingsModel);
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
       accountsModel.accounts = [
         Account(
           id: '3',
@@ -119,7 +119,7 @@ void main() {
       accountsModel.isLoading = false;
       
       // Create an activity model
-      final activityModel = AccountActivityModel(settingsModel);
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
       
       // Build the widget with providers
       await tester.pumpWidget(
@@ -153,7 +153,7 @@ void main() {
       final settingsModel = SettingsModel();
       
       // Create an accounts model with mixed status accounts
-      final accountsModel = AccountsModel(settingsModel);
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
       accountsModel.accounts = [
         Account(
           id: '1',
@@ -177,7 +177,7 @@ void main() {
       accountsModel.isLoading = false;
       
       // Create an activity model
-      final activityModel = AccountActivityModel(settingsModel);
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
       
       // Build the widget with providers
       await tester.pumpWidget(
@@ -215,7 +215,7 @@ void main() {
       final settingsModel = SettingsModel();
       
       // Create an accounts model with an active account
-      final accountsModel = AccountsModel(settingsModel);
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
       accountsModel.accounts = [
         Account(
           id: '1',
@@ -227,7 +227,7 @@ void main() {
       accountsModel.isLoading = false;
       
       // Create an activity model
-      final activityModel = AccountActivityModel(settingsModel);
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
       
       // Build the widget with all necessary providers
       await tester.pumpWidget(
@@ -258,9 +258,211 @@ void main() {
       expect(find.text('Edit Account'), findsOneWidget);
       expect(find.text('Save Changes'), findsOneWidget);
       
-      // Verify the form fields are pre-populated
-      expect(find.text('test_user'), findsOneWidget);
-      expect(find.text('test@example.com'), findsOneWidget);
+      // Verify the form fields are pre-populated (text appears in both list and dialog)
+      expect(find.text('test_user'), findsWidgets);
+      expect(find.text('test@example.com'), findsWidgets);
+      
+      // Verify Delete button exists
+      expect(find.text('Delete'), findsOneWidget);
+    });
+  });
+
+  group('AccountsView - Delete Account', () {
+    testWidgets('Delete button exists in edit dialog', (WidgetTester tester) async {
+      final settingsModel = SettingsModel();
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'test_user',
+          email: 'test@example.com',
+          status: AccountStatus.ACTIVE,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<SettingsModel>.value(value: settingsModel),
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Tap the edit button
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pumpAndSettle();
+      
+      // Verify Delete button exists and is styled in red
+      final deleteButton = find.text('Delete');
+      expect(deleteButton, findsOneWidget);
+      
+      // Verify there's also a Cancel and Save Changes button
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Save Changes'), findsOneWidget);
+    });
+  });
+
+  group('AccountsView - Show/Hide Banned Accounts', () {
+    testWidgets('Toggle switch is visible when accounts exist', (WidgetTester tester) async {
+      final settingsModel = SettingsModel();
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'active_user',
+          email: 'active@test.com',
+          status: AccountStatus.ACTIVE,
+        ),
+        Account(
+          id: '2',
+          username: 'banned_user',
+          email: 'banned@test.com',
+          status: AccountStatus.BANNED,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Verify toggle label exists
+      expect(find.text('Show Banned Accounts'), findsOneWidget);
+      
+      // Verify switch widget exists
+      expect(find.byType(Switch), findsOneWidget);
+      
+      // Verify both accounts are shown by default
+      expect(find.text('active_user'), findsOneWidget);
+      expect(find.text('banned_user'), findsOneWidget);
+    });
+
+    testWidgets('Toggle hides banned accounts when turned off', (WidgetTester tester) async {
+      final settingsModel = SettingsModel();
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'active_user',
+          email: 'active@test.com',
+          status: AccountStatus.ACTIVE,
+        ),
+        Account(
+          id: '2',
+          username: 'banned_user',
+          email: 'banned@test.com',
+          status: AccountStatus.BANNED,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Verify both accounts are visible initially
+      expect(find.text('active_user'), findsOneWidget);
+      expect(find.text('banned_user'), findsOneWidget);
+      
+      // Tap the toggle switch to hide banned accounts
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      
+      // Verify active account is still visible but banned account is hidden
+      expect(find.text('active_user'), findsOneWidget);
+      expect(find.text('banned_user'), findsNothing);
+    });
+
+    testWidgets('Toggle shows banned accounts when turned back on', (WidgetTester tester) async {
+      final settingsModel = SettingsModel();
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'active_user',
+          email: 'active@test.com',
+          status: AccountStatus.ACTIVE,
+        ),
+        Account(
+          id: '2',
+          username: 'banned_user',
+          email: 'banned@test.com',
+          status: AccountStatus.BANNED,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Turn off the toggle
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      
+      // Verify banned account is hidden
+      expect(find.text('banned_user'), findsNothing);
+      
+      // Turn the toggle back on
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      
+      // Verify banned account is visible again
+      expect(find.text('banned_user'), findsOneWidget);
     });
   });
 }

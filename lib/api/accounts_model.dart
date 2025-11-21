@@ -12,14 +12,41 @@ class AccountsModel extends ChangeNotifier {
   final List<Account> _accounts = [];
   bool _isLoading = false;
   String? _errorMessage;
+  bool _showBannedAccounts = true;
 
   List<Account> get activeAccounts => _activeAccounts;
-  List<Account> get accounts => _accounts;
+  List<Account> get accounts => _showBannedAccounts 
+      ? _accounts 
+      : _accounts.where((account) => account.status != AccountStatus.BANNED).toList();
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get showBannedAccounts => _showBannedAccounts;
 
-  AccountsModel(this.settingsModel) {
-    fetchAccounts();
+  // Test-only setters (used by unit tests)
+  @visibleForTesting
+  set accounts(List<Account> value) {
+    _accounts.clear();
+    _accounts.addAll(value);
+    _errorMessage = null; // Clear error when setting test data
+  }
+
+  @visibleForTesting
+  set isLoading(bool value) {
+    _isLoading = value;
+    if (!value) {
+      _errorMessage = null; // Clear error when loading completes in tests
+    }
+  }
+
+  void setShowBannedAccounts(bool value) {
+    _showBannedAccounts = value;
+    notifyListeners();
+  }
+
+  AccountsModel(this.settingsModel, {bool autoFetch = true}) {
+    if (autoFetch) {
+      fetchAccounts();
+    }
   }
 
   void addActiveAccount(Account account) {
