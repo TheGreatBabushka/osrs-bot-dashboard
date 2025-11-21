@@ -8,9 +8,11 @@ This is a Flutter application that serves as a dashboard for managing an Old-Sch
 
 - **Framework**: Flutter (SDK >=3.0.1 <4.0.0)
 - **Language**: Dart
-- **State Management**: Provider pattern
+- **UI**: Material Design 3 (useMaterial3: true)
+- **State Management**: Provider pattern with MultiProvider
 - **HTTP Client**: http package (^0.13.6)
 - **JSON Parsing**: Manual JSON deserialization with factory constructors
+- **Local Storage**: shared_preferences package (^2.2.0) for persistent configuration
 
 ## Project Structure
 
@@ -48,17 +50,24 @@ lib/
 ### State Management
 
 - Use the **Provider** pattern for state management
+- The app uses **MultiProvider** to manage multiple state models
 - Models should extend `ChangeNotifier` and call `notifyListeners()` after state changes
-- See `AccountsModel` and `AccountActivityModel` for reference implementations
+- Key state models:
+  - `SettingsModel`: Manages API configuration (loaded first, then passed to other models)
+  - `AccountsModel`: Manages account data
+  - `AccountActivityModel`: Manages activity data
+- Settings are loaded asynchronously on app start; show loading indicator while `SettingsModel.isLoading` is true
 
 ### API Integration
 
-- All API calls are centralized in `lib/api/bot_api.dart`
-- Base URL: `http://localhost:8080`
+- All API calls are centralized in `lib/api/api.dart` (BotAPI class)
+- **Base URL is configurable** via SettingsModel (defaults to `http://localhost:8080`)
+- Always pass `SettingsModel` to models that need API access (e.g., `AccountsModel(settingsModel)`)
 - Use `http` package for HTTP requests
 - Handle `SocketException` for network errors
 - Use `debugPrint` or `log` for error logging
 - Return `null` on errors for graceful handling
+- URL validation: API URLs must start with `http://` or `https://`
 
 ### Models and JSON
 
@@ -88,6 +97,19 @@ lib/
 - Handle `SocketException` specifically for network errors
 - Return `null` or use optional types to indicate failure
 - Log errors using `dart:developer`'s `log()` function or `debugPrint`
+
+### Settings and Configuration
+
+- Use `SettingsModel` (extends `ChangeNotifier`) to manage app configuration
+- Settings are persisted using `shared_preferences` package
+- API URL configuration:
+  - Key: `'api_ip'`
+  - Default: `'http://localhost:8080'`
+  - Validation: Must start with `http://` or `https://`
+- Load settings asynchronously in `SettingsModel` constructor
+- Use `isLoading` property to show loading state during initialization
+- Settings are accessible via `Provider.of<SettingsModel>(context)`
+- The `SettingsDialog` widget provides UI for configuration changes
 
 ## Development Commands
 
@@ -125,6 +147,16 @@ flutter run
 2. **Activity Monitoring**: Displays recent bot activities including scripts run and arguments
 3. **Bot Control**: Start/stop bots through the API
 4. **Real-time Updates**: Uses Provider pattern to reactively update UI when data changes
+5. **Persistent Configuration**: API server URL is configurable and persists across app restarts using shared_preferences
+
+## App Initialization Flow
+
+1. App starts and creates `SettingsModel` provider
+2. `SettingsModel` loads saved settings from `SharedPreferences` asynchronously
+3. While loading, app shows a loading indicator (`CircularProgressIndicator`)
+4. Once settings are loaded, `MultiProvider` creates `AccountsModel` and `AccountActivityModel`
+5. Both models receive `SettingsModel` to access the configured API URL
+6. Main UI is rendered with all providers available
 
 ## API Endpoints
 
@@ -132,13 +164,17 @@ flutter run
 - `GET /accounts` - Get all accounts
 - `GET /bots/activity` - Get recent bot activity
 - `POST /bots` - Start a bot (body: `{id, script, args}`)
+- `POST /accounts` - Create a new account (body: `{username, email, status}`)
 
 ## Important Notes
 
-- The app connects to a local backend at `http://localhost:8080`
+- **API Configuration**: The app supports configurable API server URLs through the settings dialog (⚙️ icon in app bar)
+- **Persistent Settings**: API URL is saved using `shared_preferences` and persists across app restarts
+- Default API URL: `http://localhost:8080`
 - Account statuses: `ACTIVE`, `INACTIVE`, `BANNED`
 - Provider pattern is used for state management - familiarize with `ChangeNotifier` and `notifyListeners()`
-- The project uses Material Design via `uses-material-design: true`
+- The project uses Material Design 3 via `useMaterial3: true`
+- Settings must be loaded before other models can be initialized (due to API URL dependency)
 
 ## When Making Changes
 
@@ -149,3 +185,6 @@ flutter run
 5. Keep widgets modular and reusable
 6. Handle errors gracefully, especially network errors
 7. Use const constructors for performance optimization
+8. When adding new dependencies, check for security vulnerabilities
+9. Validate user input, especially for URL configurations
+10. Use `context.mounted` checks before using context in async functions (prevents using BuildContext after widget disposal)
