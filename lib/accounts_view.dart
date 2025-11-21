@@ -137,6 +137,8 @@ class AccountsView extends StatelessWidget {
         return 'Inactive';
       case AccountStatus.BANNED:
         return 'Banned';
+      default:
+        return 'Unknown';
     }
   }
 
