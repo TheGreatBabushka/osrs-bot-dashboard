@@ -81,8 +81,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
               onPressed: () async {
                 await settingsModel.resetToDefault();
                 if (mounted) {
-                  _apiIpController.text = settingsModel.apiIp;
-                  _initialApiIp = settingsModel.apiIp;
+                  setState(() {
+                    _apiIpController.text = settingsModel.apiIp;
+                    _initialApiIp = settingsModel.apiIp;
+                    _hasChanges = false;
+                  });
                 }
               },
               child: const Text('Reset to Default'),
