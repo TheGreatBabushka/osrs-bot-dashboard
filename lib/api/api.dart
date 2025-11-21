@@ -92,6 +92,27 @@ class BotAPI {
   }
 
   /*
+   * Stops a running bot with the given account id
+   */
+  Future<bool> stopBot(String id) async {
+    log('stopping bot $id');
+    try {
+      var response = await http.delete(
+        Uri.parse("$baseUrl/bots/$id"),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.noContent;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+      return false;
+    } catch (e) {
+      debugPrint('Error stopping bot: $e');
+      return false;
+    }
+  }
+
+  /*
    * Creates a new account
    */
   Future<bool> createAccount(String username, String email, AccountStatus status) async {

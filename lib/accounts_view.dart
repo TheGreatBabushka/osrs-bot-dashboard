@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'api/account.dart';
 import 'api/account_activity.dart';
 import 'api/accounts_model.dart';
+import 'api/api.dart';
 import 'model/activity_model.dart';
 
 class AccountsView extends StatelessWidget {
@@ -143,8 +144,10 @@ class AccountsView extends StatelessWidget {
                                 isRunning ? Icons.stop_circle : Icons.play_circle,
                                 color: isRunning ? Colors.red : Colors.green,
                               ),
-                              onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
-                              tooltip: isRunning ? 'Bot Running' : 'Start Bot',
+                              onPressed: isRunning 
+                                ? () => _stopBot(context, account) 
+                                : () => _showStartBotDialog(context, account),
+                              tooltip: isRunning ? 'Stop Bot' : 'Start Bot',
                             ),
                       trailing: IconButton(
                         icon: const Icon(Icons.edit),
@@ -300,5 +303,60 @@ class AccountsView extends StatelessWidget {
         builder: (context) => AccountInfoPage(account: account),
       ),
     );
+  }
+
+  Future<void> _stopBot(BuildContext context, Account account) async {
+    final settingsModel = Provider.of<SettingsModel>(context, listen: false);
+    final accountsModel = Provider.of<AccountsModel>(context, listen: false);
+    final activityModel = Provider.of<AccountActivityModel>(context, listen: false);
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Stop Bot'),
+        content: Text('Are you sure you want to stop the bot for ${account.username}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Stop'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    // Call the stop API
+    final api = BotAPI(settingsModel.apiIp);
+    final success = await api.stopBot(account.id);
+
+    if (!context.mounted) return;
+
+    if (success) {
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Bot stopped for ${account.username}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Refresh accounts and activities
+      accountsModel.fetchAccounts();
+      activityModel.fetchActivities();
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to stop bot. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
