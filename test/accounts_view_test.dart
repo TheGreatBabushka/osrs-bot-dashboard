@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:osrs_bot_dashboard/accounts_view.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
+import 'package:osrs_bot_dashboard/api/account_activity.dart';
 import 'package:osrs_bot_dashboard/api/accounts_model.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
@@ -463,6 +464,121 @@ void main() {
       
       // Verify banned account is visible again
       expect(find.text('banned_user'), findsOneWidget);
+    });
+  });
+
+  group('AccountsView - Stop Running Bot', () {
+    testWidgets('Stop button should be enabled for running accounts', (WidgetTester tester) async {
+      final settingsModel = SettingsModel();
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'running_user',
+          email: 'running@test.com',
+          status: AccountStatus.ACTIVE,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
+      // Add a running activity for the account
+      activityModel.addActivity(
+        AccountActivity(
+          accountId: 1,
+          command: 'TestScript arg1 arg2',
+          startedAt: DateTime.now().toIso8601String(),
+          stoppedAt: '', // Empty stopped_at means it's still running
+          processId: 12345,
+        ),
+      );
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<SettingsModel>.value(value: settingsModel),
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Verify the account is displayed
+      expect(find.text('running_user'), findsOneWidget);
+      
+      // Verify that the stop button IS shown (not play button)
+      expect(find.byIcon(Icons.stop_circle), findsOneWidget);
+      expect(find.byIcon(Icons.play_circle), findsNothing);
+      
+      // Find the stop button
+      final stopButton = find.ancestor(
+        of: find.byIcon(Icons.stop_circle),
+        matching: find.byType(IconButton),
+      );
+      
+      // Verify the stop button is enabled (has an onPressed handler)
+      final iconButton = tester.widget<IconButton>(stopButton);
+      expect(iconButton.onPressed, isNotNull);
+    });
+
+    testWidgets('Stop button shows confirmation dialog when pressed', (WidgetTester tester) async {
+      final settingsModel = SettingsModel();
+      final accountsModel = AccountsModel(settingsModel, autoFetch: false);
+      accountsModel.accounts = [
+        Account(
+          id: '1',
+          username: 'running_user',
+          email: 'running@test.com',
+          status: AccountStatus.ACTIVE,
+        ),
+      ];
+      accountsModel.isLoading = false;
+      
+      final activityModel = AccountActivityModel(settingsModel, autoFetch: false);
+      // Add a running activity for the account
+      activityModel.addActivity(
+        AccountActivity(
+          accountId: 1,
+          command: 'TestScript arg1 arg2',
+          startedAt: DateTime.now().toIso8601String(),
+          stoppedAt: '', // Empty stopped_at means it's still running
+          processId: 12345,
+        ),
+      );
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider<SettingsModel>.value(value: settingsModel),
+                ChangeNotifierProvider<AccountsModel>.value(value: accountsModel),
+                ChangeNotifierProvider<AccountActivityModel>.value(value: activityModel),
+              ],
+              child: const AccountsView(),
+            ),
+          ),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Tap the stop button
+      await tester.tap(find.byIcon(Icons.stop_circle));
+      await tester.pumpAndSettle();
+      
+      // Verify confirmation dialog appears
+      expect(find.text('Stop Bot'), findsOneWidget);
+      expect(find.text('Are you sure you want to stop the bot for running_user?'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Stop'), findsOneWidget);
     });
   });
 }
