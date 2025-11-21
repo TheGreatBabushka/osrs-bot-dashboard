@@ -53,7 +53,7 @@ if [ -f "pubspec.yaml" ]; then
         echo "⚠ Warning: Failed to install dependencies. You may need to run 'flutter pub get' manually."
     fi
 else
-    echo "Warning: pubspec.yaml not found in current directory"
+    echo "⚠ Warning: pubspec.yaml not found in current directory"
 fi
 
 echo ""

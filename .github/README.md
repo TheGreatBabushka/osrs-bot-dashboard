@@ -66,5 +66,5 @@ If you encounter issues:
 
 ### Additional Documentation
 
-- **Project Guidelines**: See `.github/copilot-instructions.md` for coding conventions and project structure
+- **Project Guidelines**: See [copilot-instructions.md](copilot-instructions.md) for coding conventions and project structure
 - **Flutter Documentation**: https://docs.flutter.dev/
