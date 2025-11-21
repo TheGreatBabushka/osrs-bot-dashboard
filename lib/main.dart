@@ -128,15 +128,25 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             body: const AccountsView(),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const AddAccountDialog(),
+            floatingActionButton: Builder(
+              builder: (BuildContext scaffoldContext) {
+                return FloatingActionButton(
+                  onPressed: () {
+                    final accountsModel = Provider.of<AccountsModel>(scaffoldContext, listen: false);
+                    showDialog(
+                      context: scaffoldContext,
+                      builder: (_) => AddAccountDialog(
+                        apiIp: settingsModel.apiIp,
+                        onAccountAdded: () {
+                          accountsModel.fetchAccounts();
+                        },
+                      ),
+                    );
+                  },
+                  tooltip: 'Add Account',
+                  child: const Icon(Icons.add),
                 );
               },
-              tooltip: 'Add Account',
-              child: const Icon(Icons.add),
             ),
           ),
         );

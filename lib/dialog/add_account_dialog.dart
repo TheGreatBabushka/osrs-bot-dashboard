@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
 import 'package:osrs_bot_dashboard/api/bot_api.dart';
-import 'package:osrs_bot_dashboard/api/bot_provider.dart';
-import 'package:osrs_bot_dashboard/state/settings_model.dart';
-import 'package:provider/provider.dart';
 
 class AddAccountDialog extends StatefulWidget {
-  const AddAccountDialog({Key? key}) : super(key: key);
+  final String apiIp;
+  final VoidCallback onAccountAdded;
+
+  const AddAccountDialog({
+    Key? key,
+    required this.apiIp,
+    required this.onAccountAdded,
+  }) : super(key: key);
 
   @override
   State<AddAccountDialog> createState() => _AddAccountDialogState();
@@ -137,9 +141,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       _isSubmitting = true;
     });
 
-    final settingsModel = Provider.of<SettingsModel>(context, listen: false);
-    final accountsModel = Provider.of<AccountsModel>(context, listen: false);
-    final api = BotAPI(settingsModel.apiIp);
+    final api = BotAPI(widget.apiIp);
 
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
@@ -149,8 +151,8 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     if (!mounted) return;
 
     if (success) {
-      // Refresh the accounts list
-      await accountsModel.fetchAccounts();
+      // Notify parent to refresh the accounts list
+      widget.onAccountAdded();
       
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
