@@ -112,16 +112,18 @@ class AccountsView extends StatelessWidget {
               var account = accountsModel.accounts[index];
               var activity = _getActivityForAccount(activityModel, account);
               var isRunning = _isAccountRunning(activity);
-              
+
               return ListTile(
-                leading: IconButton(
-                  icon: Icon(
-                    isRunning ? Icons.stop_circle : Icons.play_circle,
-                    color: isRunning ? Colors.red : Colors.green,
-                  ),
-                  onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
-                  tooltip: isRunning ? 'Bot Running' : 'Start Bot',
-                ),
+                leading: account.status == AccountStatus.BANNED
+                    ? const IconButton(onPressed: null, icon: Icon(Icons.block, color: Colors.red))
+                    : IconButton(
+                        icon: Icon(
+                          isRunning ? Icons.stop_circle : Icons.play_circle,
+                          color: isRunning ? Colors.red : Colors.green,
+                        ),
+                        onPressed: isRunning ? null : () => _showStartBotDialog(context, account),
+                        tooltip: isRunning ? 'Bot Running' : 'Start Bot',
+                      ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
@@ -165,37 +167,37 @@ class AccountsView extends StatelessWidget {
 
   bool _isAccountRunning(AccountActivity? activity) {
     if (activity == null) return false;
-    
+
     var startedTime = DateTime.tryParse(activity.startedAt);
     var endedTime = DateTime.tryParse(activity.stoppedAt);
-    
+
     if (startedTime == null) return false;
-    
+
     // If stopped time is null or before/same as started time, it's running
-    if (endedTime == null || 
-        endedTime.isBefore(startedTime) || 
+    if (endedTime == null ||
+        endedTime.isBefore(startedTime) ||
         endedTime.isAtSameMomentAs(startedTime)) {
       return true;
     }
-    
+
     return false;
   }
 
   Widget _buildAccountSubtitle(Account account, AccountActivity? activity) {
     var statusText = '${account.id} • ${_getStatusLabel(account.status)}';
-    
+
     if (activity != null && _isAccountRunning(activity)) {
       var command = activity.command;
       var commandParts = command.split(' ');
       var scriptName = commandParts.isNotEmpty ? commandParts.first : 'Unknown';
-      
+
       var startedTime = DateTime.tryParse(activity.startedAt);
       var runtimeText = '';
       if (startedTime != null) {
         var runtime = DateTime.now().difference(startedTime);
         runtimeText = _formatRuntime(runtime);
       }
-      
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -210,14 +212,14 @@ class AccountsView extends StatelessWidget {
       var command = activity.command;
       var commandParts = command.split(' ');
       var scriptName = commandParts.isNotEmpty ? commandParts.first : 'Unknown';
-      
+
       var endedTime = DateTime.tryParse(activity.stoppedAt);
       var stoppedText = '';
       if (endedTime != null) {
         var timeSince = DateTime.now().difference(endedTime);
         stoppedText = _formatTimeSince(timeSince);
       }
-      
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -229,7 +231,7 @@ class AccountsView extends StatelessWidget {
         ],
       );
     }
-    
+
     return Text(statusText);
   }
 
