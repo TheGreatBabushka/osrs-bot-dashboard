@@ -97,7 +97,7 @@ class BotAPI {
   Future<bool> createAccount(String username, String email, AccountStatus status) async {
     try {
       // Convert status enum to string format expected by backend
-      String statusString = status.toString().split('.').last.toLowerCase();
+      String statusString = status.name.toLowerCase();
       
       var response = await http.post(
         Uri.parse("$baseUrl/accounts"),
