@@ -10,7 +10,7 @@ This is a Flutter application that serves as a dashboard for managing an Old-Sch
 - **Language**: Dart
 - **State Management**: Provider pattern
 - **HTTP Client**: http package (^0.13.6)
-- **Code Generation**: json_serializable for JSON serialization
+- **JSON Parsing**: Manual JSON deserialization with factory constructors
 
 ## Project Structure
 
@@ -63,7 +63,7 @@ lib/
 ### Models and JSON
 
 - Create factory constructors `fromJson` for deserializing API responses
-- Use manual JSON parsing (not relying on code generation for simple models)
+- This project uses **manual JSON parsing** (not using json_serializable code generation)
 - Example pattern:
   ```dart
   factory Account.fromJson(Map<String, dynamic> json) {
@@ -96,9 +96,6 @@ lib/
 ```bash
 # Get dependencies
 flutter pub get
-
-# Run code generation (if needed for json_serializable)
-flutter pub run build_runner build
 
 # Analyze code for issues
 flutter analyze
