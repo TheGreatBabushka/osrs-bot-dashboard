@@ -68,8 +68,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                settingsModel.resetToDefault();
+              onPressed: () async {
+                await settingsModel.resetToDefault();
                 _apiIpController.text = settingsModel.apiIp;
               },
               child: const Text('Reset to Default'),
