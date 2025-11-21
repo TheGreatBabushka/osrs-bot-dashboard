@@ -96,7 +96,7 @@ class BotAPI {
    */
   Future<bool> createAccount(String username, String email, AccountStatus status) async {
     try {
-      // Convert status enum to string format expected by backend
+      // Convert status enum to string format expected by backend (e.g., 'active', 'inactive', 'banned')
       String statusString = status.name.toLowerCase();
 
       var response = await http.post(
@@ -124,7 +124,7 @@ class BotAPI {
    */
   Future<bool> updateAccount(String id, String username, String email, AccountStatus status) async {
     try {
-      // Convert status enum to string format expected by backend
+      // Convert status enum to string format expected by backend (e.g., 'active', 'inactive', 'banned')
       String statusString = status.name.toLowerCase();
 
       var response = await http.put(
