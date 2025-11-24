@@ -26,7 +26,7 @@ class _AccountActivityItemState extends State<AccountActivityItem> {
     var commandParts = command.split(' ');
 
     var startedTime = DateTime.tryParse(activity.startedAt);
-    var endedTime = DateTime.tryParse(activity.stoppedAt);
+    var endedTime = DateTime.tryParse(activity.stoppedAt ?? '');
 
     return ExpansionTile(
       title: Text(widget.account.username),

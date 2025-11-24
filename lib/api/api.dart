@@ -72,6 +72,8 @@ class BotAPI {
       return activities;
     } on SocketException catch (_) {
       log('failed to connect to host');
+    } catch (e) {
+      log('error fetching account activity: $e');
     }
 
     return null;
