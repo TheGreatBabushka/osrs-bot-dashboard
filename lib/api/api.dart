@@ -72,6 +72,8 @@ class BotAPI {
       return activities;
     } on SocketException catch (_) {
       log('failed to connect to host');
+    } catch (e) {
+      log('error fetching account activity: $e');
     }
 
     return null;
@@ -88,6 +90,27 @@ class BotAPI {
           body: jsonEncode({"id": id, "script": script, "args": args}));
     } finally {
       client.close();
+    }
+  }
+
+  /*
+   * Stops a running bot with the given account id
+   */
+  Future<bool> stopBot(String id) async {
+    log('stopping bot $id');
+    try {
+      var response = await http.delete(
+        Uri.parse("$baseUrl/bots/$id"),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      return response.statusCode == HttpStatus.ok || response.statusCode == HttpStatus.noContent;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+      return false;
+    } catch (e) {
+      debugPrint('Error stopping bot: $e');
+      return false;
     }
   }
 

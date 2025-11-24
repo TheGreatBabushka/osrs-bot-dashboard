@@ -2,7 +2,7 @@ class AccountActivity {
   int accountId;
   String command;
   String startedAt;
-  String stoppedAt;
+  String? stoppedAt;
   int processId;
 
   AccountActivity({
