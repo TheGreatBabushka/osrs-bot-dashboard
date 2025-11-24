@@ -31,8 +31,8 @@ class AccountInfoPage extends StatelessWidget {
                       Text(
                         'Account Information',
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(context, 'Username', account.username),
@@ -66,9 +66,9 @@ class AccountInfoPage extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ),
           Expanded(
@@ -121,9 +121,9 @@ class AccountInfoPage extends StatelessWidget {
             child: Text(
               'Status',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ),
           Expanded(
@@ -138,9 +138,9 @@ class AccountInfoPage extends StatelessWidget {
                 Text(
                   statusText,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w500,
-                  ),
+                        color: statusColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ],
             ),
@@ -152,11 +152,23 @@ class AccountInfoPage extends StatelessWidget {
 
   Widget _buildActivityCard(BuildContext context) {
     final activityModel = Provider.of<AccountActivityModel>(context);
-    
+
     // Filter activities for this specific account
     final accountActivities = activityModel.activities
         .where((activity) => activity.accountId.toString() == account.id)
         .toList();
+
+    // Sort by started time (most recent first)
+    accountActivities.sort((a, b) {
+      final aTime = DateTime.tryParse(a.startedAt);
+      final bTime = DateTime.tryParse(b.startedAt);
+
+      if (aTime == null && bTime == null) return 0;
+      if (aTime == null) return 1;
+      if (bTime == null) return -1;
+
+      return bTime.compareTo(aTime); // Most recent first
+    });
 
     return Card(
       child: Padding(
@@ -170,8 +182,8 @@ class AccountInfoPage extends StatelessWidget {
                 Text(
                   'Activity History',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.refresh),
@@ -196,8 +208,8 @@ class AccountInfoPage extends StatelessWidget {
                       Text(
                         'No activity history',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                       ),
                     ],
                   ),

@@ -87,7 +87,7 @@ class BotAPI {
     var client = http.Client();
     try {
       await client.post(Uri.parse("$baseUrl/bots"),
-          body: jsonEncode({"id": id, "script": script, "args": args}));
+          body: jsonEncode({"id": id, "script": script, "params": args}));
     } finally {
       client.close();
     }
