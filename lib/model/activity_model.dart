@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -14,13 +15,30 @@ import 'package:osrs_bot_dashboard/state/settings_model.dart';
 class AccountActivityModel extends ChangeNotifier {
   final SettingsModel settingsModel;
   final List<AccountActivity> _activities = [];
+  Timer? _refreshTimer;
+  bool _disposed = false;
 
   List<AccountActivity> get activities => _activities;
 
   AccountActivityModel(this.settingsModel, {bool autoFetch = true}) {
     if (autoFetch) {
       fetchActivities();
+      _startAutoRefresh();
     }
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      fetchActivities();
+    });
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   void addActivity(AccountActivity activity) {
@@ -39,8 +57,12 @@ class AccountActivityModel extends ChangeNotifier {
   }
 
   void fetchActivities() async {
+    if (_disposed) return;
+    
     final api = BotAPI(settingsModel.apiIp);
     var activities = await api.fetchAccountActivity();
+    if (_disposed) return;
+    
     if (activities == null) {
       log("Failed to fetch activities");
       return;

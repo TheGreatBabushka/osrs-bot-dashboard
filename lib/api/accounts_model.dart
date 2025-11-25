@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ class AccountsModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   bool _showBannedAccounts = true;
+  Timer? _refreshTimer;
+  bool _disposed = false;
 
   List<Account> get activeAccounts => _activeAccounts;
   List<Account> get accounts => _showBannedAccounts 
@@ -46,7 +49,22 @@ class AccountsModel extends ChangeNotifier {
   AccountsModel(this.settingsModel, {bool autoFetch = true}) {
     if (autoFetch) {
       fetchAccounts();
+      _startAutoRefresh();
     }
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      fetchAccounts();
+    });
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   void addActiveAccount(Account account) {
@@ -65,6 +83,8 @@ class AccountsModel extends ChangeNotifier {
   }
 
   Future<void> fetchAccounts() async {
+    if (_disposed) return;
+    
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -73,6 +93,8 @@ class AccountsModel extends ChangeNotifier {
       final api = BotAPI(settingsModel.apiIp);
 
       var accounts = await api.getActiveAccounts();
+      if (_disposed) return;
+      
       if (accounts == null) {
         log("Failed to fetch active accounts");
         _errorMessage = "Failed to load accounts. Please try again.";
@@ -85,6 +107,8 @@ class AccountsModel extends ChangeNotifier {
       _activeAccounts.addAll(accounts);
 
       accounts = await api.getAccounts();
+      if (_disposed) return;
+      
       if (accounts == null) {
         log("Failed to fetch accounts");
         _errorMessage = "Failed to load accounts. Please try again.";
@@ -96,11 +120,14 @@ class AccountsModel extends ChangeNotifier {
       _accounts.clear();
       _accounts.addAll(accounts);
     } catch (e) {
+      if (_disposed) return;
       log("Error fetching accounts: $e");
       _errorMessage = "An unexpected error occurred. Please try again later.";
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (!_disposed) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 }
