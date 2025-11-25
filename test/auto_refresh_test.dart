@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:osrs_bot_dashboard/api/account.dart';
 import 'package:osrs_bot_dashboard/api/accounts_model.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
