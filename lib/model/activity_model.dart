@@ -70,6 +70,8 @@ class AccountActivityModel extends ChangeNotifier {
 
     _activities.clear();
     _activities.addAll(activities);
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 }
