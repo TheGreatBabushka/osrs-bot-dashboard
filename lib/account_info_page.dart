@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
+import 'package:osrs_bot_dashboard/card/levels_card.dart';
 import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/account_activity_item.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,8 @@ class AccountInfoPage extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              LevelsCard(accountId: account.id),
               const SizedBox(height: 16),
               _buildActivityCard(context),
             ],

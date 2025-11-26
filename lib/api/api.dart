@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
+import 'package:osrs_bot_dashboard/api/levels.dart';
 
 import 'account.dart';
 
@@ -188,5 +188,27 @@ class BotAPI {
       debugPrint('Error deleting account: $e');
       return false;
     }
+  }
+
+  /*
+   * Returns the skill levels for a specific account
+   */
+  Future<Levels?> getLevels(String id) async {
+    try {
+      var response = await http.get(Uri.parse("$baseUrl/levels/$id"));
+      if (response.statusCode != HttpStatus.ok) {
+        log('Failed to fetch levels: ${response.statusCode}');
+        return null;
+      }
+
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      return Levels.fromJson(decodedResponse);
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+    } catch (e) {
+      log('Error fetching levels: $e');
+    }
+
+    return null;
   }
 }
