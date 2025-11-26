@@ -46,17 +46,23 @@ class AccountActivityModel extends ChangeNotifier {
 
   void addActivity(AccountActivity activity) {
     _activities.add(activity);
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   void removeActivity(AccountActivity activity) {
     _activities.remove(activity);
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   void clearActivities() {
     _activities.clear();
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   void fetchActivities() async {

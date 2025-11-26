@@ -6,8 +6,6 @@ import 'package:osrs_bot_dashboard/state/settings_model.dart';
 void main() {
   group('Auto-refresh functionality', () {
     test('AccountsModel starts auto-refresh timer when autoFetch is true', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      
       final settingsModel = SettingsModel();
       
       // Wait for settings to load
@@ -26,8 +24,6 @@ void main() {
     });
 
     test('AccountsModel does not start auto-refresh when autoFetch is false', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      
       final settingsModel = SettingsModel();
       
       // Wait for settings to load
@@ -43,8 +39,6 @@ void main() {
     });
 
     test('AccountsModel disposes timer properly', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      
       final settingsModel = SettingsModel();
       
       // Wait for settings to load
@@ -63,8 +57,6 @@ void main() {
     });
 
     test('AccountActivityModel starts auto-refresh timer when autoFetch is true', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      
       final settingsModel = SettingsModel();
       
       // Wait for settings to load
@@ -83,8 +75,6 @@ void main() {
     });
 
     test('AccountActivityModel does not start auto-refresh when autoFetch is false', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      
       final settingsModel = SettingsModel();
       
       // Wait for settings to load
@@ -100,8 +90,6 @@ void main() {
     });
 
     test('AccountActivityModel disposes timer properly', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      
       final settingsModel = SettingsModel();
       
       // Wait for settings to load

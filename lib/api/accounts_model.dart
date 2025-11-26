@@ -46,7 +46,9 @@ class AccountsModel extends ChangeNotifier {
 
   void setShowBannedAccounts(bool value) {
     _showBannedAccounts = value;
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   AccountsModel(this.settingsModel, {bool autoFetch = true}) {
@@ -72,17 +74,23 @@ class AccountsModel extends ChangeNotifier {
 
   void addActiveAccount(Account account) {
     _activeAccounts.add(account);
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   void removeActiveAccount(Account account) {
     _activeAccounts.remove(account);
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   void clearActiveAccounts() {
     _activeAccounts.clear();
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   Future<void> fetchAccounts() async {
@@ -90,7 +98,9 @@ class AccountsModel extends ChangeNotifier {
     
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
 
     try {
       final api = BotAPI(settingsModel.apiIp);
@@ -102,7 +112,9 @@ class AccountsModel extends ChangeNotifier {
         log("Failed to fetch active accounts");
         _errorMessage = "Failed to load accounts. Please try again.";
         _isLoading = false;
-        notifyListeners();
+        if (!_disposed) {
+          notifyListeners();
+        }
         return;
       }
 
@@ -116,7 +128,9 @@ class AccountsModel extends ChangeNotifier {
         log("Failed to fetch accounts");
         _errorMessage = "Failed to load accounts. Please try again.";
         _isLoading = false;
-        notifyListeners();
+        if (!_disposed) {
+          notifyListeners();
+        }
         return;
       }
 
