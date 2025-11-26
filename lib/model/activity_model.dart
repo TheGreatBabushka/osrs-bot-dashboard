@@ -6,6 +6,9 @@ import 'package:osrs_bot_dashboard/api/account_activity.dart';
 import 'package:osrs_bot_dashboard/api/api.dart';
 import 'package:osrs_bot_dashboard/state/settings_model.dart';
 
+/// Refresh interval for auto-updating activity data
+const Duration kActivityRefreshInterval = Duration(seconds: 5);
+
 /// Model class for the most recent activity a bot has performed
 ///
 /// Stores the account activities for all known bots retrieved from the API
@@ -29,7 +32,7 @@ class AccountActivityModel extends ChangeNotifier {
 
   void _startAutoRefresh() {
     _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _refreshTimer = Timer.periodic(kActivityRefreshInterval, (timer) {
       fetchActivities();
     });
   }

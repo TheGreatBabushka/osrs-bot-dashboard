@@ -7,6 +7,9 @@ import 'package:osrs_bot_dashboard/state/settings_model.dart';
 
 import 'account.dart';
 
+/// Refresh interval for auto-updating account data
+const Duration kAccountsRefreshInterval = Duration(seconds: 5);
+
 class AccountsModel extends ChangeNotifier {
   final SettingsModel settingsModel;
   final List<Account> _activeAccounts = [];
@@ -55,7 +58,7 @@ class AccountsModel extends ChangeNotifier {
 
   void _startAutoRefresh() {
     _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _refreshTimer = Timer.periodic(kAccountsRefreshInterval, (timer) {
       fetchAccounts();
     });
   }
