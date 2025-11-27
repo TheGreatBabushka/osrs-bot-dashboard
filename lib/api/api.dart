@@ -225,7 +225,7 @@ class BotAPI {
       }
 
       var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-      
+
       // Handle both list and single object responses
       if (decodedResponse is List) {
         if (decodedResponse.isEmpty) {
@@ -236,7 +236,7 @@ class BotAPI {
       } else if (decodedResponse is Map<String, dynamic>) {
         return Xp.fromJson(decodedResponse);
       }
-      
+
       return null;
     } on SocketException catch (e) {
       debugPrint(e.toString());
@@ -259,7 +259,7 @@ class BotAPI {
       }
 
       var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-      
+
       // Handle both list and single object responses
       if (decodedResponse is List) {
         if (decodedResponse.isEmpty) {
@@ -270,7 +270,7 @@ class BotAPI {
       } else if (decodedResponse is Map<String, dynamic>) {
         return Xp.fromJson(decodedResponse);
       }
-      
+
       return null;
     } on SocketException catch (e) {
       debugPrint(e.toString());
@@ -292,29 +292,80 @@ class BotAPI {
 
     for (var item in xpList) {
       if (item is Map<String, dynamic>) {
-        attack += (item['attack'] ?? 0) as int;
-        defence += (item['defence'] ?? 0) as int;
-        strength += (item['strength'] ?? 0) as int;
-        hitpoints += (item['hitpoints'] ?? 0) as int;
-        ranged += (item['ranged'] ?? 0) as int;
-        prayer += (item['prayer'] ?? 0) as int;
-        magic += (item['magic'] ?? 0) as int;
-        cooking += (item['cooking'] ?? 0) as int;
-        woodcutting += (item['woodcutting'] ?? 0) as int;
-        fletching += (item['fletching'] ?? 0) as int;
-        fishing += (item['fishing'] ?? 0) as int;
-        firemaking += (item['firemaking'] ?? 0) as int;
-        crafting += (item['crafting'] ?? 0) as int;
-        smithing += (item['smithing'] ?? 0) as int;
-        mining += (item['mining'] ?? 0) as int;
-        herblore += (item['herblore'] ?? 0) as int;
-        agility += (item['agility'] ?? 0) as int;
-        thieving += (item['thieving'] ?? 0) as int;
-        slayer += (item['slayer'] ?? 0) as int;
-        farming += (item['farming'] ?? 0) as int;
-        runecraft += (item['runecraft'] ?? 0) as int;
-        hunter += (item['hunter'] ?? 0) as int;
-        construction += (item['construction'] ?? 0) as int;
+        final skill = (item['skill'] as String?)?.toLowerCase() ?? '';
+        final xpGained = (item['xp_gained'] ?? 0) as int;
+
+        switch (skill) {
+          case 'attack':
+            attack += xpGained;
+            break;
+          case 'defence':
+            defence += xpGained;
+            break;
+          case 'strength':
+            strength += xpGained;
+            break;
+          case 'hitpoints':
+            hitpoints += xpGained;
+            break;
+          case 'ranged':
+            ranged += xpGained;
+            break;
+          case 'prayer':
+            prayer += xpGained;
+            break;
+          case 'magic':
+            magic += xpGained;
+            break;
+          case 'cooking':
+            cooking += xpGained;
+            break;
+          case 'woodcutting':
+            woodcutting += xpGained;
+            break;
+          case 'fletching':
+            fletching += xpGained;
+            break;
+          case 'fishing':
+            fishing += xpGained;
+            break;
+          case 'firemaking':
+            firemaking += xpGained;
+            break;
+          case 'crafting':
+            crafting += xpGained;
+            break;
+          case 'smithing':
+            smithing += xpGained;
+            break;
+          case 'mining':
+            mining += xpGained;
+            break;
+          case 'herblore':
+            herblore += xpGained;
+            break;
+          case 'agility':
+            agility += xpGained;
+            break;
+          case 'thieving':
+            thieving += xpGained;
+            break;
+          case 'slayer':
+            slayer += xpGained;
+            break;
+          case 'farming':
+            farming += xpGained;
+            break;
+          case 'runecraft':
+            runecraft += xpGained;
+            break;
+          case 'hunter':
+            hunter += xpGained;
+            break;
+          case 'construction':
+            construction += xpGained;
+            break;
+        }
       }
     }
 
