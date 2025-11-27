@@ -232,18 +232,18 @@ class _LevelsCardState extends State<LevelsCard> {
         children: [
           Icon(
             icon,
-            size: 28,
+            size: 18,
             color: color,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             level.toString(),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             skillName,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
