@@ -5,6 +5,7 @@ void main() {
   group('AccountActivity', () {
     test('fromJson creates AccountActivity correctly', () {
       final json = {
+        'id': 1,
         'account_id': 123,
         'command': 'woodcutting',
         'started_at': '2024-01-01T10:00:00Z',
@@ -14,6 +15,7 @@ void main() {
 
       final activity = AccountActivity.fromJson(json);
 
+      expect(activity.id, equals(1));
       expect(activity.accountId, equals(123));
       expect(activity.command, equals('woodcutting'));
       expect(activity.startedAt, equals('2024-01-01T10:00:00Z'));
@@ -21,8 +23,25 @@ void main() {
       expect(activity.processId, equals(4567));
     });
 
+    test('fromJson handles missing id field', () {
+      final json = {
+        'account_id': 123,
+        'command': 'woodcutting',
+        'started_at': '2024-01-01T10:00:00Z',
+        'stopped_at': '2024-01-01T12:00:00Z',
+        'pid': 4567,
+      };
+
+      final activity = AccountActivity.fromJson(json);
+
+      expect(activity.id, isNull);
+      expect(activity.accountId, equals(123));
+      expect(activity.command, equals('woodcutting'));
+    });
+
     test('toJson converts AccountActivity to correct JSON format', () {
       final activity = AccountActivity(
+        id: 1,
         accountId: 456,
         command: 'fishing',
         startedAt: '2024-01-02T14:30:00Z',
@@ -32,6 +51,7 @@ void main() {
 
       final json = activity.toJson();
 
+      expect(json['id'], equals(1));
       expect(json['account_id'], equals(456));
       expect(json['command'], equals('fishing'));
       expect(json['started_at'], equals('2024-01-02T14:30:00Z'));
@@ -41,6 +61,7 @@ void main() {
 
     test('fromJson and toJson are symmetric', () {
       final originalJson = {
+        'id': 1,
         'account_id': 789,
         'command': 'mining',
         'started_at': '2024-01-03T08:00:00Z',
@@ -56,6 +77,7 @@ void main() {
 
     test('toString returns formatted string', () {
       final activity = AccountActivity(
+        id: 1,
         accountId: 111,
         command: 'combat',
         startedAt: '2024-01-04T12:00:00Z',
@@ -65,10 +87,11 @@ void main() {
 
       final stringRepresentation = activity.toString();
 
+      expect(stringRepresentation, contains('id: 1'));
       expect(stringRepresentation, contains('account_id: 111'));
       expect(stringRepresentation, contains('command: combat'));
-      expect(stringRepresentation, contains('startedAt: 2024-01-04T12:00:00Z'));
-      expect(stringRepresentation, contains('stoppedAt: 2024-01-04T13:00:00Z'));
+      expect(stringRepresentation, contains('started_at: 2024-01-04T12:00:00Z'));
+      expect(stringRepresentation, contains('stopped_at: 2024-01-04T13:00:00Z'));
       expect(stringRepresentation, contains('process_id: 2222'));
     });
   });

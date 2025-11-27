@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:osrs_bot_dashboard/api/account.dart';
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
+import 'package:osrs_bot_dashboard/api/api.dart';
+import 'package:osrs_bot_dashboard/api/xp.dart';
+import 'package:osrs_bot_dashboard/state/settings_model.dart';
+import 'package:provider/provider.dart';
 
 class AccountActivityItem extends StatefulWidget {
   final Account account;
@@ -18,6 +22,39 @@ class AccountActivityItem extends StatefulWidget {
 }
 
 class _AccountActivityItemState extends State<AccountActivityItem> {
+  Xp? _activityXp;
+  bool _isLoadingXp = false;
+  bool _xpFetched = false;
+
+  Future<void> _fetchActivityXp() async {
+    if (_xpFetched || widget.activity.id == null) return;
+
+    setState(() {
+      _isLoadingXp = true;
+    });
+
+    try {
+      final settingsModel = Provider.of<SettingsModel>(context, listen: false);
+      final api = BotAPI(settingsModel.apiIp);
+      final xp = await api.getActivityXp(widget.activity.id!);
+
+      if (mounted) {
+        setState(() {
+          _activityXp = xp;
+          _isLoadingXp = false;
+          _xpFetched = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingXp = false;
+          _xpFetched = true;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var activity = widget.activity;
@@ -38,6 +75,11 @@ class _AccountActivityItemState extends State<AccountActivityItem> {
       subtitle: Text(commandParts.first),
       leading: _buildLeading(startedTime, endedTime),
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      onExpansionChanged: (expanded) {
+        if (expanded) {
+          _fetchActivityXp();
+        }
+      },
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -59,6 +101,8 @@ class _AccountActivityItemState extends State<AccountActivityItem> {
                 _buildDetailRow(context, 'Runtime:', _formatCurrentRuntime(startedTime)),
                 const SizedBox(height: 8),
               ],
+              // XP Gained Section
+              _buildXpSection(context),
               if (hasParams) ...[
                 const Divider(),
                 const SizedBox(height: 8),
@@ -103,6 +147,95 @@ class _AccountActivityItemState extends State<AccountActivityItem> {
         ),
       ],
     );
+  }
+
+  Widget _buildXpSection(BuildContext context) {
+    if (widget.activity.id == null) {
+      return const SizedBox.shrink();
+    }
+
+    if (_isLoadingXp) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                'XP Gained:',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(width: 8),
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
+      );
+    }
+
+    if (_activityXp == null || _activityXp!.totalXp == 0) {
+      return const SizedBox.shrink();
+    }
+
+    final nonZeroSkills = _activityXp!.nonZeroSkillEntries;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(),
+        const SizedBox(height: 8),
+        Text(
+          'XP Gained:',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: nonZeroSkills.map((entry) {
+            return Chip(
+              label: Text(
+                '${entry.key}: ${_formatXp(entry.value)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Total: ${_formatXp(_activityXp!.totalXp)} XP',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  String _formatXp(int xp) {
+    if (xp >= 1000000) {
+      return '${(xp / 1000000).toStringAsFixed(1)}M';
+    } else if (xp >= 1000) {
+      return '${(xp / 1000).toStringAsFixed(1)}K';
+    }
+    return xp.toString();
   }
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {

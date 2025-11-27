@@ -1,4 +1,5 @@
 class AccountActivity {
+  int? id;
   int accountId;
   String command;
   String startedAt;
@@ -6,6 +7,7 @@ class AccountActivity {
   int processId;
 
   AccountActivity({
+    this.id,
     required this.accountId,
     required this.command,
     required this.startedAt,
@@ -15,6 +17,7 @@ class AccountActivity {
 
   factory AccountActivity.fromJson(Map<String, dynamic> json) {
     return AccountActivity(
+      id: json['id'],
       accountId: json['account_id'],
       command: json['command'],
       startedAt: json['started_at'],
@@ -25,6 +28,7 @@ class AccountActivity {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'account_id': accountId,
       'command': command,
       'started_at': startedAt,
@@ -35,6 +39,6 @@ class AccountActivity {
 
   @override
   String toString() {
-    return 'AccountActivity{account_id: $accountId, command: $command, started_at: $startedAt, stopped_at: $stoppedAt, process_id: $processId}';
+    return 'AccountActivity{id: $id, account_id: $accountId, command: $command, started_at: $startedAt, stopped_at: $stoppedAt, process_id: $processId}';
   }
 }

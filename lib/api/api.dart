@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
 import 'package:osrs_bot_dashboard/api/levels.dart';
+import 'package:osrs_bot_dashboard/api/xp.dart';
 
 import 'account.dart';
 
@@ -207,6 +208,50 @@ class BotAPI {
       debugPrint(e.toString());
     } catch (e) {
       log('Error fetching levels: $e');
+    }
+
+    return null;
+  }
+
+  /*
+   * Returns the total XP gained for a specific account
+   */
+  Future<Xp?> getAccountXp(String accountId) async {
+    try {
+      var response = await http.get(Uri.parse("$baseUrl/accounts/$accountId/xp"));
+      if (response.statusCode != HttpStatus.ok) {
+        log('Failed to fetch account XP: ${response.statusCode}');
+        return null;
+      }
+
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      return Xp.fromJson(decodedResponse);
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+    } catch (e) {
+      log('Error fetching account XP: $e');
+    }
+
+    return null;
+  }
+
+  /*
+   * Returns the XP gained for a specific activity
+   */
+  Future<Xp?> getActivityXp(int activityId) async {
+    try {
+      var response = await http.get(Uri.parse("$baseUrl/activity/$activityId/xp"));
+      if (response.statusCode != HttpStatus.ok) {
+        log('Failed to fetch activity XP: ${response.statusCode}');
+        return null;
+      }
+
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      return Xp.fromJson(decodedResponse);
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+    } catch (e) {
+      log('Error fetching activity XP: $e');
     }
 
     return null;
