@@ -5,16 +5,23 @@ import 'package:osrs_bot_dashboard/model/activity_model.dart';
 import 'package:osrs_bot_dashboard/account_activity_item.dart';
 import 'package:provider/provider.dart';
 
-class AccountInfoPage extends StatelessWidget {
+class AccountInfoPage extends StatefulWidget {
   final Account account;
 
   const AccountInfoPage({super.key, required this.account});
 
   @override
+  State<AccountInfoPage> createState() => _AccountInfoPageState();
+}
+
+class _AccountInfoPageState extends State<AccountInfoPage> {
+  bool _isActivityExpanded = true;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(account.username),
+        title: Text(widget.account.username),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Padding(
@@ -36,11 +43,11 @@ class AccountInfoPage extends StatelessWidget {
                             ),
                       ),
                       const SizedBox(height: 16),
-                      _buildInfoRow(context, 'Username', account.username),
+                      _buildInfoRow(context, 'Username', widget.account.username),
                       const Divider(),
-                      _buildInfoRow(context, 'Email', account.email),
+                      _buildInfoRow(context, 'Email', widget.account.email),
                       const Divider(),
-                      _buildInfoRow(context, 'Account ID', account.id),
+                      _buildInfoRow(context, 'Account ID', widget.account.id),
                       const Divider(),
                       _buildStatusRow(context),
                     ],
@@ -48,7 +55,7 @@ class AccountInfoPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              LevelsCard(accountId: account.id),
+              LevelsCard(accountId: widget.account.id),
               const SizedBox(height: 16),
               _buildActivityCard(context),
             ],
@@ -91,7 +98,7 @@ class AccountInfoPage extends StatelessWidget {
     IconData statusIcon;
     String statusText;
 
-    switch (account.status) {
+    switch (widget.account.status) {
       case AccountStatus.ACTIVE:
         statusColor = colorScheme.primary;
         statusIcon = Icons.check_circle;
@@ -158,7 +165,7 @@ class AccountInfoPage extends StatelessWidget {
 
     // Filter activities for this specific account
     final accountActivities = activityModel.activities
-        .where((activity) => activity.accountId.toString() == account.id)
+        .where((activity) => activity.accountId.toString() == widget.account.id)
         .toList();
 
     // Sort by started time (most recent first)
@@ -175,62 +182,82 @@ class AccountInfoPage extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Activity History',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: () => activityModel.fetchActivities(),
-                  tooltip: 'Refresh Activities',
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (accountActivities.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isActivityExpanded = !_isActivityExpanded;
+                });
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
                       Icon(
-                        Icons.history,
-                        size: 48,
+                        _isActivityExpanded ? Icons.expand_less : Icons.expand_more,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(width: 8),
                       Text(
-                        'No activity history',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        'Activity History',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
                       ),
                     ],
                   ),
-                ),
-              )
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: accountActivities.length,
-                itemBuilder: (context, index) {
-                  final activity = accountActivities[index];
-                  return AccountActivityItem(
-                    account: account,
-                    activity: activity,
-                  );
-                },
+                  IconButton(
+                    icon: const Icon(Icons.refresh, size: 18),
+                    onPressed: () => activityModel.fetchActivities(),
+                    tooltip: 'Refresh Activities',
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ],
               ),
+            ),
+            if (_isActivityExpanded) ...[
+              const SizedBox(height: 12),
+              if (accountActivities.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.history,
+                          size: 48,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'No activity history',
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: accountActivities.length,
+                  itemBuilder: (context, index) {
+                    final activity = accountActivities[index];
+                    return AccountActivityItem(
+                      account: widget.account,
+                      activity: activity,
+                    );
+                  },
+                ),
+            ],
           ],
         ),
       ),

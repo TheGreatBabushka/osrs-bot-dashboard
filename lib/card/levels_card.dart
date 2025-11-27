@@ -19,6 +19,7 @@ class _LevelsCardState extends State<LevelsCard> {
   Levels? _levels;
   bool _isLoading = true;
   String? _errorMessage;
+  bool _isExpanded = true;
 
   @override
   void initState() {
@@ -60,51 +61,71 @@ class _LevelsCardState extends State<LevelsCard> {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Skill Levels',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        _isExpanded ? Icons.expand_less : Icons.expand_more,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                ),
-                Row(
-                  children: [
-                    if (_levels != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          'Total: ${_levels!.totalLevel}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              ),
-                        ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Skill Levels',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: _fetchLevels,
-                      tooltip: 'Refresh Levels',
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      if (_levels != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Total: ${_levels!.totalLevel}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                ),
+                          ),
+                        ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        icon: const Icon(Icons.refresh, size: 18),
+                        onPressed: _fetchLevels,
+                        tooltip: 'Refresh Levels',
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildContent(),
+            if (_isExpanded) ...[
+              const SizedBox(height: 12),
+              _buildContent(),
+            ],
           ],
         ),
       ),
@@ -183,16 +204,16 @@ class _LevelsCardState extends State<LevelsCard> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate columns based on available width
+        // Calculate columns based on available width - more columns for compact view
         int crossAxisCount;
         if (constraints.maxWidth > 800) {
-          crossAxisCount = 6;
+          crossAxisCount = 8;
         } else if (constraints.maxWidth > 600) {
-          crossAxisCount = 5;
+          crossAxisCount = 7;
         } else if (constraints.maxWidth > 400) {
-          crossAxisCount = 4;
+          crossAxisCount = 6;
         } else {
-          crossAxisCount = 3;
+          crossAxisCount = 5;
         }
 
         return GridView.builder(
@@ -200,9 +221,9 @@ class _LevelsCardState extends State<LevelsCard> {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            childAspectRatio: 1.0,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
+            childAspectRatio: 0.85,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
           ),
           itemCount: skills.length,
           itemBuilder: (context, index) {
@@ -219,9 +240,10 @@ class _LevelsCardState extends State<LevelsCard> {
     final color = SkillIcons.getColor(skillName);
 
     return Container(
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: color.withAlpha(30),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: color.withAlpha(100),
           width: 1,
@@ -232,22 +254,23 @@ class _LevelsCardState extends State<LevelsCard> {
         children: [
           Icon(
             icon,
-            size: 18,
+            size: 14,
             color: color,
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             level.toString(),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 11,
                 ),
           ),
-          const SizedBox(height: 1),
           Text(
             skillName,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 8,
                 ),
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
