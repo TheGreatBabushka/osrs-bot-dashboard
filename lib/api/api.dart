@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:osrs_bot_dashboard/api/account_activity.dart';
 import 'package:osrs_bot_dashboard/api/levels.dart';
+import 'package:osrs_bot_dashboard/api/xp.dart';
 
 import 'account.dart';
 
@@ -210,5 +211,188 @@ class BotAPI {
     }
 
     return null;
+  }
+
+  /*
+   * Returns the total XP gained for a specific account
+   */
+  Future<Xp?> getAccountXp(String accountId) async {
+    try {
+      var response = await http.get(Uri.parse("$baseUrl/accounts/$accountId/xp"));
+      if (response.statusCode != HttpStatus.ok) {
+        log('Failed to fetch account XP: ${response.statusCode}');
+        return null;
+      }
+
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+
+      // Handle both list and single object responses
+      if (decodedResponse is List) {
+        if (decodedResponse.isEmpty) {
+          return null;
+        }
+        // Aggregate XP from all records in the list
+        return _aggregateXpFromList(decodedResponse);
+      } else if (decodedResponse is Map<String, dynamic>) {
+        return Xp.fromJson(decodedResponse);
+      }
+
+      return null;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+    } catch (e) {
+      log('Error fetching account XP: $e');
+    }
+
+    return null;
+  }
+
+  /*
+   * Returns the XP gained for a specific activity
+   */
+  Future<Xp?> getActivityXp(int activityId) async {
+    try {
+      var response = await http.get(Uri.parse("$baseUrl/activity/$activityId/xp"));
+      if (response.statusCode != HttpStatus.ok) {
+        log('Failed to fetch activity XP: ${response.statusCode}');
+        return null;
+      }
+
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+
+      // Handle both list and single object responses
+      if (decodedResponse is List) {
+        if (decodedResponse.isEmpty) {
+          return null;
+        }
+        // Aggregate XP from all records in the list
+        return _aggregateXpFromList(decodedResponse);
+      } else if (decodedResponse is Map<String, dynamic>) {
+        return Xp.fromJson(decodedResponse);
+      }
+
+      return null;
+    } on SocketException catch (e) {
+      debugPrint(e.toString());
+    } catch (e) {
+      log('Error fetching activity XP: $e');
+    }
+
+    return null;
+  }
+
+  /// Aggregates XP from a list of XP records by summing all skill values
+  Xp _aggregateXpFromList(List<dynamic> xpList) {
+    int attack = 0, defence = 0, strength = 0, hitpoints = 0;
+    int ranged = 0, prayer = 0, magic = 0, cooking = 0;
+    int woodcutting = 0, fletching = 0, fishing = 0, firemaking = 0;
+    int crafting = 0, smithing = 0, mining = 0, herblore = 0;
+    int agility = 0, thieving = 0, slayer = 0, farming = 0;
+    int runecraft = 0, hunter = 0, construction = 0;
+
+    for (var item in xpList) {
+      if (item is Map<String, dynamic>) {
+        final skill = (item['skill'] as String?)?.toLowerCase() ?? '';
+        final xpGained = (item['xp_gained'] ?? 0) as int;
+
+        switch (skill) {
+          case 'attack':
+            attack += xpGained;
+            break;
+          case 'defence':
+            defence += xpGained;
+            break;
+          case 'strength':
+            strength += xpGained;
+            break;
+          case 'hitpoints':
+            hitpoints += xpGained;
+            break;
+          case 'ranged':
+            ranged += xpGained;
+            break;
+          case 'prayer':
+            prayer += xpGained;
+            break;
+          case 'magic':
+            magic += xpGained;
+            break;
+          case 'cooking':
+            cooking += xpGained;
+            break;
+          case 'woodcutting':
+            woodcutting += xpGained;
+            break;
+          case 'fletching':
+            fletching += xpGained;
+            break;
+          case 'fishing':
+            fishing += xpGained;
+            break;
+          case 'firemaking':
+            firemaking += xpGained;
+            break;
+          case 'crafting':
+            crafting += xpGained;
+            break;
+          case 'smithing':
+            smithing += xpGained;
+            break;
+          case 'mining':
+            mining += xpGained;
+            break;
+          case 'herblore':
+            herblore += xpGained;
+            break;
+          case 'agility':
+            agility += xpGained;
+            break;
+          case 'thieving':
+            thieving += xpGained;
+            break;
+          case 'slayer':
+            slayer += xpGained;
+            break;
+          case 'farming':
+            farming += xpGained;
+            break;
+          case 'runecraft':
+            runecraft += xpGained;
+            break;
+          case 'hunter':
+            hunter += xpGained;
+            break;
+          case 'construction':
+            construction += xpGained;
+            break;
+        }
+      }
+    }
+
+    return Xp(
+      attack: attack,
+      defence: defence,
+      strength: strength,
+      hitpoints: hitpoints,
+      ranged: ranged,
+      prayer: prayer,
+      magic: magic,
+      cooking: cooking,
+      woodcutting: woodcutting,
+      fletching: fletching,
+      fishing: fishing,
+      firemaking: firemaking,
+      crafting: crafting,
+      smithing: smithing,
+      mining: mining,
+      herblore: herblore,
+      agility: agility,
+      thieving: thieving,
+      slayer: slayer,
+      farming: farming,
+      runecraft: runecraft,
+      hunter: hunter,
+      construction: construction,
+    );
   }
 }
