@@ -224,8 +224,20 @@ class BotAPI {
         return null;
       }
 
-      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
-      return Xp.fromJson(decodedResponse);
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+      
+      // Handle both list and single object responses
+      if (decodedResponse is List) {
+        if (decodedResponse.isEmpty) {
+          return null;
+        }
+        // Aggregate XP from all records in the list
+        return _aggregateXpFromList(decodedResponse);
+      } else if (decodedResponse is Map<String, dynamic>) {
+        return Xp.fromJson(decodedResponse);
+      }
+      
+      return null;
     } on SocketException catch (e) {
       debugPrint(e.toString());
     } catch (e) {
@@ -246,8 +258,20 @@ class BotAPI {
         return null;
       }
 
-      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
-      return Xp.fromJson(decodedResponse);
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+      
+      // Handle both list and single object responses
+      if (decodedResponse is List) {
+        if (decodedResponse.isEmpty) {
+          return null;
+        }
+        // Aggregate XP from all records in the list
+        return _aggregateXpFromList(decodedResponse);
+      } else if (decodedResponse is Map<String, dynamic>) {
+        return Xp.fromJson(decodedResponse);
+      }
+      
+      return null;
     } on SocketException catch (e) {
       debugPrint(e.toString());
     } catch (e) {
@@ -255,5 +279,69 @@ class BotAPI {
     }
 
     return null;
+  }
+
+  /// Aggregates XP from a list of XP records by summing all skill values
+  Xp _aggregateXpFromList(List<dynamic> xpList) {
+    int attack = 0, defence = 0, strength = 0, hitpoints = 0;
+    int ranged = 0, prayer = 0, magic = 0, cooking = 0;
+    int woodcutting = 0, fletching = 0, fishing = 0, firemaking = 0;
+    int crafting = 0, smithing = 0, mining = 0, herblore = 0;
+    int agility = 0, thieving = 0, slayer = 0, farming = 0;
+    int runecraft = 0, hunter = 0, construction = 0;
+
+    for (var item in xpList) {
+      if (item is Map<String, dynamic>) {
+        attack += (item['attack'] ?? 0) as int;
+        defence += (item['defence'] ?? 0) as int;
+        strength += (item['strength'] ?? 0) as int;
+        hitpoints += (item['hitpoints'] ?? 0) as int;
+        ranged += (item['ranged'] ?? 0) as int;
+        prayer += (item['prayer'] ?? 0) as int;
+        magic += (item['magic'] ?? 0) as int;
+        cooking += (item['cooking'] ?? 0) as int;
+        woodcutting += (item['woodcutting'] ?? 0) as int;
+        fletching += (item['fletching'] ?? 0) as int;
+        fishing += (item['fishing'] ?? 0) as int;
+        firemaking += (item['firemaking'] ?? 0) as int;
+        crafting += (item['crafting'] ?? 0) as int;
+        smithing += (item['smithing'] ?? 0) as int;
+        mining += (item['mining'] ?? 0) as int;
+        herblore += (item['herblore'] ?? 0) as int;
+        agility += (item['agility'] ?? 0) as int;
+        thieving += (item['thieving'] ?? 0) as int;
+        slayer += (item['slayer'] ?? 0) as int;
+        farming += (item['farming'] ?? 0) as int;
+        runecraft += (item['runecraft'] ?? 0) as int;
+        hunter += (item['hunter'] ?? 0) as int;
+        construction += (item['construction'] ?? 0) as int;
+      }
+    }
+
+    return Xp(
+      attack: attack,
+      defence: defence,
+      strength: strength,
+      hitpoints: hitpoints,
+      ranged: ranged,
+      prayer: prayer,
+      magic: magic,
+      cooking: cooking,
+      woodcutting: woodcutting,
+      fletching: fletching,
+      fishing: fishing,
+      firemaking: firemaking,
+      crafting: crafting,
+      smithing: smithing,
+      mining: mining,
+      herblore: herblore,
+      agility: agility,
+      thieving: thieving,
+      slayer: slayer,
+      farming: farming,
+      runecraft: runecraft,
+      hunter: hunter,
+      construction: construction,
+    );
   }
 }
