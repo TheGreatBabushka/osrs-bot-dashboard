@@ -255,6 +255,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                   itemBuilder: (context, index) {
                     final activity = accountActivities[index];
                     return AccountActivityItem(
+                      key: ValueKey('${activity.id}_${activity.startedAt}_${activity.stoppedAt}'),
                       account: widget.account,
                       activity: activity,
                     );

@@ -24,10 +24,9 @@ class AccountActivityItem extends StatefulWidget {
 class _AccountActivityItemState extends State<AccountActivityItem> {
   Xp? _activityXp;
   bool _isLoadingXp = false;
-  bool _xpFetched = false;
 
   Future<void> _fetchActivityXp() async {
-    if (_xpFetched || widget.activity.id == null) return;
+    if (widget.activity.id == null) return;
 
     setState(() {
       _isLoadingXp = true;
@@ -42,14 +41,12 @@ class _AccountActivityItemState extends State<AccountActivityItem> {
         setState(() {
           _activityXp = xp;
           _isLoadingXp = false;
-          _xpFetched = true;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoadingXp = false;
-          _xpFetched = true;
         });
       }
     }
